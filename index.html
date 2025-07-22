@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VM Agent - Bulk Update Visualization</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Chat Simulation Area -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <i class="fas fa-robot"></i>
+                <span>VM Agent</span>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <p>I'll help you cancel the selected volunteer initiatives. Let me analyze the impact first...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Summary Component -->
+            <div class="impact-summary" id="impactSummary">
+                <div class="summary-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Bulk Update Impact Summary</h3>
+                </div>
+                
+                <div class="action-info">
+                    <span class="action-badge action-cancel">Cancel Status</span>
+                    <span class="starting-point">Starting from: <strong>2 Volunteer Initiatives</strong></span>
+                </div>
+                
+                <div class="impact-counts">
+                    <div class="count-item primary">
+                        <i class="fas fa-heart"></i>
+                        <div class="count-details">
+                            <span class="count">2</span>
+                            <span class="label">Volunteer Initiatives</span>
+                        </div>
+                    </div>
+                    <div class="count-item">
+                        <i class="fas fa-briefcase"></i>
+                        <div class="count-details">
+                            <span class="count">18</span>
+                            <span class="label">Job Positions</span>
+                        </div>
+                    </div>
+                    <div class="count-item">
+                        <i class="fas fa-clock"></i>
+                        <div class="count-details">
+                            <span class="count">156</span>
+                            <span class="label">Job Position Shifts</span>
+                        </div>
+                    </div>
+                    <div class="count-item">
+                        <i class="fas fa-users"></i>
+                        <div class="count-details">
+                            <span class="count">423</span>
+                            <span class="label">Job Position Assignments</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-actions">
+                    <button class="btn btn-secondary" onclick="openVisualization()">
+                        <i class="fas fa-sitemap"></i>
+                        View Detailed Impact
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-check"></i>
+                        Proceed with Update
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visualization Modal -->
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h2>
+                        <i class="fas fa-sitemap"></i>
+                        Bulk Update Impact Visualization
+                    </h2>
+                    <button class="btn-close" onclick="closeVisualization()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="modal-toolbar">
+                    <div class="view-controls">
+                        <button class="btn btn-small active" id="treeViewBtn" onclick="switchView('tree')">
+                            <i class="fas fa-sitemap"></i>
+                            Tree View
+                        </button>
+                        <button class="btn btn-small" id="listViewBtn" onclick="switchView('list')">
+                            <i class="fas fa-list"></i>
+                            List View
+                        </button>
+                    </div>
+                    
+                    <div class="tree-controls" id="treeControls">
+                        <button class="btn btn-small" onclick="expandAll()">
+                            <i class="fas fa-expand-alt"></i>
+                            Expand All
+                        </button>
+                        <button class="btn btn-small" onclick="collapseAll()">
+                            <i class="fas fa-compress-alt"></i>
+                            Collapse All
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="modal-content">
+                    <!-- Tree View -->
+                    <div class="tree-view" id="treeView">
+                        <div class="tree-container">
+                            <div id="hierarchyTree"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- List View -->
+                    <div class="list-view" id="listView" style="display: none;">
+                        <div class="tabs">
+                            <button class="tab active" onclick="switchTab('initiatives')">
+                                <i class="fas fa-heart"></i>
+                                Volunteer Initiatives (2)
+                            </button>
+                            <button class="tab" onclick="switchTab('positions')">
+                                <i class="fas fa-briefcase"></i>
+                                Job Positions (18)
+                            </button>
+                            <button class="tab" onclick="switchTab('shifts')">
+                                <i class="fas fa-clock"></i>
+                                Job Shifts (156)
+                            </button>
+                            <button class="tab" onclick="switchTab('assignments')">
+                                <i class="fas fa-users"></i>
+                                Assignments (423)
+                            </button>
+                        </div>
+                        
+                        <div class="tab-content">
+                            <div id="initiativesList" class="tab-panel active"></div>
+                            <div id="positionsList" class="tab-panel"></div>
+                            <div id="shiftsList" class="tab-panel"></div>
+                            <div id="assignmentsList" class="tab-panel"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <div class="impact-summary-mini">
+                        <span class="total-impact">Total Impact: 599 records will be updated</span>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeVisualization()">
+                            Close
+                        </button>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-check"></i>
+                            Confirm Bulk Update
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 

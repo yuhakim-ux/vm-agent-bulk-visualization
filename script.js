@@ -39,6 +39,17 @@ const sampleData = {
                             assignments: [
                                 { id: 'assign_4', volunteerName: 'David Park', email: 'david.p@email.com', status: 'Confirmed' }
                             ]
+                        },
+                        {
+                            id: 'shift_3',
+                            name: 'Distribution Coordination',
+                            startTime: '2024-03-02T08:00:00',
+                            endTime: '2024-03-02T12:00:00',
+                            location: 'Community Center Main Hall',
+                            status: 'Active',
+                            assignments: [
+                                { id: 'assign_7', volunteerName: 'Lisa Chen', email: 'lisa.c@email.com', status: 'Confirmed' }
+                            ]
                         }
                     ]
                 },
@@ -137,6 +148,15 @@ function openAgentforce() {
     // Initialize chat messages
     initializeChatMessages();
     
+    // Add Enter key listener to chat input
+    const chatInput = document.getElementById('chatInput');
+    chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+    
     // Initialize the visualization
     renderTreeView();
     renderListView();
@@ -184,17 +204,6 @@ function initializeChatMessages() {
     setTimeout(() => {
         addMessage('user', 'Hmm, show me the visualization.');
     }, 2500);
-    
-    setTimeout(() => {
-        addMessage('user', 'I want to cancel Food Drive Coordinator, not the initiative.');
-    }, 4000);
-    
-    setTimeout(() => {
-        addMessage('agent', 'Got it! Canceling Food Drive Coordinator will impact a total of 7 records:\n\n• 1 Job Position: The position will be cancelled\n• 2 Job Shifts: All scheduled shifts will be removed\n• 4 Job Position Assignments: All volunteer assignments will be cancelled\n\nI\'ve updated the visualization to show the impact of canceling just this position. The Volunteer Initiative will remain active.');
-        
-        // Update the visualization to show position-level impact
-        updateVisualizationForPosition();
-    }, 4800);
 }
 
 function addMessage(type, content) {
@@ -235,10 +244,23 @@ function sendMessage() {
         addMessage('user', message);
         input.value = '';
         
-        // Simulate agent response
-        setTimeout(() => {
-            addMessage('agent', 'I understand your question. The visualization on the right shows the current analysis. Is there anything specific you\'d like me to explain about the impact?');
-        }, 1000);
+        // Check if user wants to switch to position-level cancellation
+        if (message.toLowerCase().includes('food drive coordinator') && 
+            message.toLowerCase().includes('not the initiative')) {
+            
+            setTimeout(() => {
+                addMessage('agent', 'Got it! Canceling Food Drive Coordinator will impact a total of 8 records:\n\n• 1 Job Position: The position will be cancelled\n• 3 Job Shifts: All scheduled shifts will be removed\n• 4 Job Position Assignments: All volunteer assignments will be cancelled\n\nI\'ve updated the visualization to show the impact of canceling just this position. The Volunteer Initiative will remain active.');
+                
+                // Update the visualization to show position-level impact
+                updateVisualizationForPosition();
+            }, 1000);
+            
+        } else {
+            // Default agent response for other messages
+            setTimeout(() => {
+                addMessage('agent', 'I understand your question. The visualization on the right shows the current analysis. Is there anything specific you\'d like me to explain about the impact?');
+            }, 1000);
+        }
     }
 }
 
@@ -249,7 +271,7 @@ function updateVisualizationForPosition() {
     // Update header
     const headerElement = document.querySelector('.viz-header h3');
     if (headerElement) {
-        headerElement.textContent = '7 records will be updated';
+        headerElement.textContent = '8 records will be updated';
     }
     
     // Update expanded nodes for position view

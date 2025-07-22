@@ -653,14 +653,32 @@ function switchTab(tabName) {
 }
 
 function renderInitiativesList() {
-    const container = document.getElementById('initiativesList');
-    if (!container) {
-        alert('Container "initiativesList" not found!');
-        return;
+    try {
+        console.log('renderInitiativesList: Starting...');
+        const container = document.getElementById('initiativesList');
+        console.log('renderInitiativesList: Container found:', container);
+        
+        if (!container) {
+            alert('Container "initiativesList" not found!');
+            return;
+        }
+        
+        console.log('renderInitiativesList: About to check sampleData...');
+        console.log('renderInitiativesList: sampleData:', sampleData);
+        console.log('renderInitiativesList: sampleData.initiatives:', sampleData.initiatives);
+        
+        // Simple test - just put some text
+        const testHtml = '<div style="padding: 20px; background: yellow; border: 2px solid red;"><h3>TEST: renderInitiativesList was called!</h3><p>Container found successfully!</p><p>Sample data has ' + sampleData.initiatives.length + ' initiatives</p></div>';
+        
+        console.log('renderInitiativesList: About to set innerHTML...');
+        container.innerHTML = testHtml;
+        console.log('renderInitiativesList: innerHTML set successfully!');
+        console.log('renderInitiativesList: Container now contains:', container.innerHTML);
+        
+    } catch (error) {
+        console.error('Error in renderInitiativesList:', error);
+        alert('Error in renderInitiativesList: ' + error.message);
     }
-    
-    // Simple test - just put some text
-    container.innerHTML = '<div style="padding: 20px; background: yellow; border: 2px solid red;"><h3>TEST: renderInitiativesList was called!</h3><p>Container found successfully!</p><p>Sample data has ' + sampleData.initiatives.length + ' initiatives</p></div>';
 }
 
 function renderPositionsList() {

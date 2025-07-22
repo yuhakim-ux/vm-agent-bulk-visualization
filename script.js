@@ -177,15 +177,11 @@ function initializeChatMessages() {
     chatMessages.innerHTML = '';
     
     // Add initial messages
-    addMessage('user', 'I want to cancel the Community Food Drive 2024 initiative. Can you show me what will be affected?');
+    addMessage('user', 'I want to cancel the Community Food Drive 2024 initiative.');
     
     setTimeout(() => {
-        addMessage('agent', 'I\'ll analyze the impact of canceling that initiative. Let me check all the related records...');
-    }, 500);
-    
-    setTimeout(() => {
-        addMessage('agent', 'Analysis complete! Canceling the Community Food Drive 2024 initiative will affect:\n\n• 2 Job Positions\n• 3 Job Position Shifts  \n• 9 Job Position Assignments\n\nI\'ve opened the detailed visualization on the left so you can explore the full hierarchy and see exactly which records will be updated.');
-    }, 1500);
+        addMessage('agent', 'Canceling the Community Food Drive 2024 initiative will impact a total of 15 records:\n\n• 1 Volunteer Initiatives\n• 2 Job Positions\n• 3 Job Position Shifts\n• 9 Job Position Assignments\n\nI\'ve opened a detailed visualization so you can explore the full hierarchy and see which records will be affected. Let me know if you\'d like to proceed with the cancellation.');
+    }, 800);
 }
 
 function addMessage(type, content) {
@@ -685,7 +681,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update total impact
     const totalImpact = totals.initiatives + totals.positions + totals.shifts + totals.assignments;
-    document.querySelector('.total-impact').textContent = `Total Impact: ${totalImpact} records will be updated`;
+    
+    // Update header dynamically
+    const headerElement = document.querySelector('.viz-header h3');
+    if (headerElement) {
+        headerElement.textContent = `Bulk Update: ${totalImpact} records will be updated`;
+    }
     
     // Close modal when clicking outside
     document.getElementById('agentforceModal').addEventListener('click', function(e) {

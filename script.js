@@ -178,7 +178,7 @@ function updateTooltipContent() {
             The parent Volunteer Initiative will not be affected.
         `;
     } else {
-        tooltipTitle.textContent = '14 records will be updated';
+        tooltipTitle.textContent = '15 records will be updated';
         tooltipDescription.innerHTML = `
             Canceling this Volunteer Initiative will cascade to related records:
             <ul>

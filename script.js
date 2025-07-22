@@ -37,10 +37,7 @@ const sampleData = {
                             location: 'Community Center Storage Room',
                             status: 'Active',
                             assignments: [
-                                { id: 'assign_4', volunteerName: 'David Park', email: 'david.p@email.com', status: 'Confirmed' },
-                                { id: 'assign_5', volunteerName: 'Emma Wilson', email: 'emma.w@email.com', status: 'Confirmed' },
-                                { id: 'assign_6', volunteerName: 'James Miller', email: 'james.m@email.com', status: 'Confirmed' },
-                                { id: 'assign_7', volunteerName: 'Anna Thompson', email: 'anna.t@email.com', status: 'Waitlist' }
+                                { id: 'assign_4', volunteerName: 'David Park', email: 'david.p@email.com', status: 'Confirmed' }
                             ]
                         }
                     ]
@@ -76,6 +73,7 @@ let currentView = 'tree';
 let currentTab = 'initiatives';
 let expandedNodes = new Set(['init_1']); // Initially expand root nodes
 let isChatPanelCollapsed = false;
+let currentViewMode = 'initiative'; // 'initiative' or 'position'
 
 // Utility functions
 function formatDate(dateString) {
@@ -186,6 +184,17 @@ function initializeChatMessages() {
     setTimeout(() => {
         addMessage('user', 'Hmm, show me the visualization.');
     }, 2500);
+    
+    setTimeout(() => {
+        addMessage('user', 'I want to cancel Food Drive Coordinator, not the initiative.');
+    }, 4000);
+    
+    setTimeout(() => {
+        addMessage('agent', 'Got it! Canceling Food Drive Coordinator will impact a total of 7 records:\n\n• 1 Job Position: The position will be cancelled\n• 2 Job Shifts: All scheduled shifts will be removed\n• 4 Job Position Assignments: All volunteer assignments will be cancelled\n\nI\'ve updated the visualization to show the impact of canceling just this position. The Volunteer Initiative will remain active.');
+        
+        // Update the visualization to show position-level impact
+        updateVisualizationForPosition();
+    }, 4800);
 }
 
 function addMessage(type, content) {
@@ -233,6 +242,44 @@ function sendMessage() {
     }
 }
 
+// Function to update visualization for position-level view
+function updateVisualizationForPosition() {
+    currentViewMode = 'position';
+    
+    // Update header
+    const headerElement = document.querySelector('.viz-header h3');
+    if (headerElement) {
+        headerElement.textContent = '7 records will be updated';
+    }
+    
+    // Update expanded nodes for position view
+    expandedNodes.clear();
+    expandedNodes.add('init_1'); // Keep initiative visible but not expanded
+    expandedNodes.add('pos_1'); // Expand the target position
+    
+    // Re-render the tree view
+    renderTreeView();
+    renderListView();
+}
+
+// Function to determine if a node should be grayed out
+function shouldNodeBeGrayedOut(item, type) {
+    if (currentViewMode !== 'position') {
+        return false; // No graying out in initiative mode
+    }
+    
+    // In position mode, gray out the initiative and non-target positions
+    if (type === 'initiative') {
+        return true; // Initiative is not being cancelled, so gray it out
+    }
+    
+    if (type === 'position' && item.id === 'pos_2') {
+        return true; // Collection Site Manager is not being cancelled
+    }
+    
+    return false; // All other nodes (target position, shifts, assignments) show normally
+}
+
 function switchView(view) {
     currentView = view;
     
@@ -276,8 +323,12 @@ function createTreeNode(item, type, cssClass = '') {
     const isExpanded = expandedNodes.has(item.id);
     const hasChildren = getChildrenCount(item, type) > 0;
     
+    // Determine if this node should be grayed out
+    const isGrayedOut = shouldNodeBeGrayedOut(item, type);
+    const grayedClass = isGrayedOut ? 'grayed-out' : '';
+    
     const nodeHeader = document.createElement('div');
-    nodeHeader.className = `node-header ${cssClass} ${type}`;
+    nodeHeader.className = `node-header ${cssClass} ${type} ${grayedClass}`;
     nodeHeader.onclick = () => toggleNode(item.id, nodeHeader.nextElementSibling);
     
     const toggleIcon = hasChildren ? 
@@ -374,6 +425,12 @@ function renderChildren(container, parent, parentType) {
             children = parent.assignments || [];
             childType = 'assignment';
             break;
+    }
+    
+    // In position mode, only show children for the target position and its descendants
+    if (currentViewMode === 'position' && parentType === 'initiative') {
+        // Only show the target position (Food Drive Coordinator)
+        children = children.filter(child => child.id === 'pos_1');
     }
     
     // Add section header if there are children

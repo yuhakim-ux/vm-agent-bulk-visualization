@@ -574,6 +574,35 @@ body {
     border-left: 4px solid #8b5cf6;
 }
 
+/* Grayed out nodes (not affected by cancellation) */
+.node-header.grayed-out {
+    opacity: 0.4;
+    background: #f9f9f9 !important;
+    border-color: #e5e5e5 !important;
+    color: #706e6b !important;
+}
+
+.node-header.grayed-out:hover {
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
+}
+
+.node-header.grayed-out .node-title,
+.node-header.grayed-out .node-subtitle,
+.node-header.grayed-out .node-count {
+    color: #706e6b !important;
+}
+
+.node-header.grayed-out .node-count {
+    background: #e5e5e5 !important;
+    color: #706e6b !important;
+}
+
+.node-header.grayed-out .expand-toggle {
+    background: rgba(112, 110, 107, 0.1) !important;
+}
+
 /* List View */
 .list-view {
     flex: 1;

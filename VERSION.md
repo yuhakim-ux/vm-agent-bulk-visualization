@@ -14,6 +14,17 @@
 
 ---
 
+## v1.1.0 ✅ (Released - December 2024)
+**Tag:** `v1.1.0`
+**Branch:** `development`
+
+### ✨ Major Features Completed:
+- ✅ **Fixed Table Visibility:** Resolved the issue where data tables were not appearing in the List View tabs.
+- ✅ **Simplified Tab Switching:** Refactored the JavaScript function for handling tab clicks to be more direct and reliable.
+- ✅ **Corrected HTML Structure:** Cleaned up the HTML to remove redundant classes.
+
+---
+
 ## v1.0.0 ✅ (Released - December 2024)
 **Tag:** `v1.0.0`  
 **Branch:** `development` (now archived)

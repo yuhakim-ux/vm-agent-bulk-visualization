@@ -141,10 +141,64 @@ function calculateTotals() {
     return totals;
 }
 
+function updateVisualizationForPosition() {
+    currentViewMode = 'position';
+    
+    // Update header
+    const headerElement = document.querySelector('.viz-header h3');
+    if (headerElement) {
+        headerElement.textContent = '8 records will be updated';
+    }
+    
+    // Update tooltip
+    updateTooltipContent();
+    
+    // Update expanded nodes for position view
+    expandedNodes.clear();
+    expandedNodes.add('init_1'); // Keep initiative visible but not expanded
+    expandedNodes.add('pos_1'); // Expand the target position
+    
+    // Re-render the tree and list views
+    renderTreeView();
+    renderListView();
+}
+
+function updateTooltipContent() {
+    const tooltipTitle = document.querySelector('.tooltip-title');
+    const tooltipDescription = document.querySelector('.tooltip-description');
+    
+    if (currentViewMode === 'position') {
+        tooltipTitle.textContent = '8 records will be updated';
+        tooltipDescription.innerHTML = `
+            Canceling this Job Position will cascade to related records:
+            <ul>
+                <li><strong>Job Shifts:</strong> All scheduled shifts will be removed</li>
+                <li><strong>Assignments:</strong> All volunteer assignments will be cancelled</li>
+            </ul>
+            The parent Volunteer Initiative will not be affected.
+        `;
+    } else {
+        tooltipTitle.textContent = '15 records will be updated';
+        tooltipDescription.innerHTML = `
+            Canceling this Volunteer Initiative will cascade to related records:
+            <ul>
+                <li><strong>Job Positions:</strong> All associated positions will be cancelled</li>
+                <li><strong>Job Shifts:</strong> All scheduled shifts will be removed</li>
+                <li><strong>Assignments:</strong> All volunteer assignments will be cancelled</li>
+            </ul>
+            This action cannot be undone.
+        `;
+    }
+}
+
 // Agentforce Modal functions
 function openAgentforce() {
     document.getElementById('agentforceModal').style.display = 'block';
     document.body.style.overflow = 'hidden';
+    
+    // Reset view and update tooltip to default
+    currentViewMode = 'initiative';
+    updateTooltipContent();
     
     // Initialize chat messages
     initializeChatMessages();
@@ -263,26 +317,6 @@ function sendMessage() {
             }, 1000);
         }
     }
-}
-
-// Function to update visualization for position-level view
-function updateVisualizationForPosition() {
-    currentViewMode = 'position';
-    
-    // Update header
-    const headerElement = document.querySelector('.viz-header h3');
-    if (headerElement) {
-        headerElement.textContent = '8 records will be updated';
-    }
-    
-    // Update expanded nodes for position view
-    expandedNodes.clear();
-    expandedNodes.add('init_1'); // Keep initiative visible but not expanded
-    expandedNodes.add('pos_1'); // Expand the target position
-    
-    // Re-render the tree view
-    renderTreeView();
-    renderListView();
 }
 
 // Function to determine if a node should be grayed out
@@ -869,28 +903,57 @@ function sortTable(tableId, column, type, data, columns) {
     sortIcon.className = `fas fa-sort-${sortDirection === 'asc' ? 'up' : 'down'} slds-m-left_x-small sort-icon`;
     
     // Sort the data
-    const sortedData = [...data].sort((a, b) => {
-        let aVal = a[column] || '';
-        let bVal = b[column] || '';
+    data.sort((a, b) => {
+        const aValue = a[column];
+        const bValue = b[column];
         
-        // Convert to strings for comparison
-        aVal = aVal.toString().toLowerCase();
-        bVal = bVal.toString().toLowerCase();
-        
-        if (sortDirection === 'asc') {
-            return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-        } else {
-            return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+        if (aValue < bValue) {
+            return sortDirection === 'asc' ? -1 : 1;
         }
+        if (aValue > bValue) {
+            return sortDirection === 'asc' ? 1 : -1;
+        }
+        return 0;
     });
     
-    // Re-render table body with sorted data
-    const tbody = table.querySelector('tbody');
-    tbody.innerHTML = '';
-    
-    sortedData.forEach((item) => {
+    // Re-render the table
+    renderDataTable(tableId, type, data, columns);
+}
+
+function renderDataTable(tableId, type, data, columns) {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+
+    let html = `
+        <div class="slds-table_cell-buffer">
+            <table class="slds-table slds-table_cell-buffer slds-table_striped slds-table_col-bordered data-table" id="${tableId}">
+                <thead>
+                    <tr class="slds-line-height_reset">
+    `;
+
+    // Generate table headers
+    columns.forEach(column => {
+        const sortClass = column.sortable ? 'sortable-header' : '';
+        const sortIcon = column.sortable ? '<i class="fas fa-sort slds-m-left_x-small sort-icon"></i>' : '';
+        html += `
+            <th class="${sortClass}" data-column="${column.key}" data-type="${type}" scope="col">
+                <div class="slds-truncate" title="${column.label}">
+                    ${column.label}${sortIcon}
+                </div>
+            </th>
+        `;
+    });
+
+    html += `
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    // Generate table rows
+    data.forEach((item, index) => {
         const rowClass = item.isAffected === false ? 'grayed-out-row' : '';
-        let rowHtml = `<tr class="${rowClass}">`;
+        html += `<tr class="${rowClass}">`;
         
         columns.forEach(column => {
             let cellValue = item[column.key] || '';
@@ -904,88 +967,25 @@ function sortTable(tableId, column, type, data, columns) {
             
             // Handle linked columns
             if (column.linked && cellValue) {
-                const originalValue = item[column.key];
-                cellValue = `<a href="#" class="slds-link record-link" data-id="${item.id}" data-type="${type}">${originalValue}</a>`;
+                cellValue = `<a href="#" class="slds-link record-link" data-id="${item.id}" data-type="${type}">${cellValue}</a>`;
             }
             
-            rowHtml += `
+            html += `
                 <td class="${cellClass}" data-label="${column.label}">
                     <div class="slds-truncate" title="${item[column.key] || ''}">${cellValue}</div>
                 </td>
             `;
         });
         
-        rowHtml += '</tr>';
-        tbody.innerHTML += rowHtml;
+        html += '</tr>';
     });
     
-    // Re-add event listeners for links
-    const recordLinks = table.querySelectorAll('.record-link');
-    recordLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            console.log(`Clicked ${link.dataset.type} record:`, link.dataset.id);
-        });
-    });
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    table.innerHTML = html;
+    addTableEventListeners(tableId, type, data, columns);
 }
-
-// Initialize the application
-document.addEventListener('DOMContentLoaded', function() {
-    const totals = calculateTotals();
-    
-    // Update the summary counts in the UI
-    const countItems = document.querySelectorAll('.count-item .count');
-    if (countItems.length >= 4) {
-        countItems[0].textContent = totals.initiatives;
-        countItems[1].textContent = totals.positions;
-        countItems[2].textContent = totals.shifts;
-        countItems[3].textContent = totals.assignments;
-    }
-    
-    // Update total impact
-    const totalImpact = totals.initiatives + totals.positions + totals.shifts + totals.assignments;
-    
-    // Update header dynamically
-    const headerElement = document.querySelector('.viz-header h3');
-    if (headerElement) {
-        headerElement.textContent = `${totalImpact} records will be updated`;
-    }
-    
-    // Close modal when clicking outside
-    document.getElementById('agentforceModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeAgentforce();
-        }
-    });
-    
-    // Keyboard support
-    document.addEventListener('keydown', function(e) {
-        const modal = document.getElementById('agentforceModal');
-        if (e.key === 'Escape' && modal.style.display === 'block') {
-            closeAgentforce();
-        }
-        
-        // Enter to send message when input is focused
-        if (e.key === 'Enter' && e.target.id === 'chatInput') {
-            if (!e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        }
-    });
-    
-    // Initialize with correct totals for the demo
-    console.log(`VM Agent ready - ${totalImpact} total records in sample data`);
-});
-
-// Add CSS for status classes
-const statusStyles = document.createElement('style');
-statusStyles.textContent = `
-    .status-active { background: #e8f5e8; color: #2e844a; }
-    .status-confirmed { background: #e8f4fd; color: #0176d3; }
-    .status-pending { background: #fef7e8; color: #fe9339; }
-    .status-waitlist { background: #f3e8ff; color: #8b5cf6; }
-    .status-cancelled { background: #ffebee; color: #c62d42; }
-    .status-default { background: #f4f6f9; color: #706e6b; }
-`;
-document.head.appendChild(statusStyles); 

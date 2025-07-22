@@ -157,9 +157,8 @@ function openAgentforce() {
         }
     });
     
-    // Initialize the visualization
+    // Initialize the tree visualization only
     renderTreeView();
-    renderListView();
     
     // Set initial view state
     switchView('tree');
@@ -652,8 +651,8 @@ function renderInitiativesList() {
         initiatives.push({
             id: initiative.id,
             name: initiative.name,
-                            currentStatus: initiative.status,
-                plannedStatus: currentViewMode === 'initiative' ? 'Canceled' : initiative.status
+            currentStatus: initiative.status,
+            plannedStatus: currentViewMode === 'initiative' ? 'Canceled' : initiative.status
         });
     });
     
@@ -761,23 +760,16 @@ function createDataTable(type, data, columns) {
     
     const tableId = `${type}-table`;
     let html = `
-        <div class="slds-table_cell-buffer">
-            <table class="slds-table slds-table_cell-buffer slds-table_striped slds-table_col-bordered data-table" id="${tableId}">
-                <thead>
-                    <tr class="slds-line-height_reset">
+        <div style="padding: 1rem;">
+            <h4 style="margin-bottom: 1rem;">Found ${data.length} ${type}(s)</h4>
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
+                <thead style="background-color: #f5f5f5;">
+                    <tr>
     `;
     
-    // Generate table headers
+    // Generate simple table headers
     columns.forEach(column => {
-        const sortClass = column.sortable ? 'sortable-header' : '';
-        const sortIcon = column.sortable ? '<i class="fas fa-sort slds-m-left_x-small sort-icon"></i>' : '';
-        html += `
-            <th class="${sortClass}" data-column="${column.key}" data-type="${type}" scope="col">
-                <div class="slds-truncate" title="${column.label}">
-                    ${column.label}${sortIcon}
-                </div>
-            </th>
-        `;
+        html += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${column.label}</th>`;
     });
     
     html += `
@@ -786,31 +778,19 @@ function createDataTable(type, data, columns) {
                 <tbody>
     `;
     
-    // Generate table rows
+    // Generate simple table rows
     data.forEach((item, index) => {
-        const rowClass = item.isAffected === false ? 'grayed-out-row' : '';
-        html += `<tr class="${rowClass}">`;
+        html += `<tr style="background-color: ${index % 2 === 0 ? '#fff' : '#f9f9f9'};">`;
         
         columns.forEach(column => {
             let cellValue = item[column.key] || '';
-            let cellClass = '';
-            
-            // Handle status columns - keep as plain text
-            if (column.key === 'currentStatus' || column.key === 'plannedStatus') {
-                cellClass = `status-cell`;
-                // Keep as plain text, no badges
-            }
             
             // Handle linked columns
             if (column.linked && cellValue) {
-                cellValue = `<a href="#" class="slds-link record-link" data-id="${item.id}" data-type="${type}">${cellValue}</a>`;
+                cellValue = `<a href="#" style="color: #0176d3; text-decoration: none;">${cellValue}</a>`;
             }
             
-            html += `
-                <td class="${cellClass}" data-label="${column.label}">
-                    <div class="slds-truncate" title="${item[column.key] || ''}">${cellValue}</div>
-                </td>
-            `;
+            html += `<td style="border: 1px solid #ddd; padding: 8px;">${cellValue}</td>`;
         });
         
         html += '</tr>';
@@ -821,11 +801,6 @@ function createDataTable(type, data, columns) {
             </table>
         </div>
     `;
-    
-    // Add event listeners for sorting after table is rendered
-    setTimeout(() => {
-        addTableEventListeners(tableId, type, data, columns);
-    }, 0);
     
     return html;
 }
@@ -850,7 +825,6 @@ function addTableEventListeners(tableId, type, data, columns) {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             // Handle record link clicks - could open details modal, etc.
-            console.log(`Clicked ${link.dataset.type} record:`, link.dataset.id);
         });
     });
 }
@@ -936,7 +910,6 @@ function sortTable(tableId, column, type, data, columns) {
     recordLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log(`Clicked ${link.dataset.type} record:`, link.dataset.id);
         });
     });
 }
@@ -987,7 +960,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Initialize with correct totals for the demo
-    console.log(`VM Agent ready - ${totalImpact} total records in sample data`);
 });
 
 // Status classes for basic styling (plain text only)

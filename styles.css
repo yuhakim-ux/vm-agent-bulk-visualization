@@ -261,13 +261,22 @@ body {
 }
 
 .message-avatar.agent {
-    background: #0176D3;
-    color: white;
+    background-color: transparent;
+}
+
+.message-avatar.agent img {
+    width: 32px;
+    height: 32px;
 }
 
 .message-avatar.user {
-    background: #fe9339;
-    color: white;
+    background-color: transparent;
+}
+
+.message-avatar.user img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
 }
 
 .message-bubble {
@@ -939,4 +948,45 @@ body {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+} 
+
+/* New Chat Input Area */
+.new-chat-input-area {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    border-top: 1px solid #dddbda;
+}
+
+.new-chat-input {
+    flex-grow: 1;
+    border-radius: 8px;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    line-height: 1.5;
+    resize: none;
+    overflow-y: auto;
+    max-height: 120px;
+    border: 1px solid #c9c9c9;
+    transition: all 0.2s ease;
+}
+
+.new-chat-input:focus {
+    border-color: #0176d3;
+    box-shadow: 0 0 0 1px #0176d3;
+}
+
+.new-send-button {
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    padding: 0;
+}
+
+.new-send-button i {
+    font-size: 14px;
 } 

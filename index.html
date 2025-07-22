@@ -151,10 +151,10 @@
                         <div class="chat-panel" id="chatPanel">
                             <!-- Chat Panel Header -->
                             <div class="chat-panel-header">
-                                <h3 class="slds-text-heading_small">Conversation</h3>
+                                <h3 class="slds-text-heading_small">Agentforce</h3>
                                 <button class="slds-button slds-button_icon chat-toggle" onclick="toggleChatPanel()" title="Collapse Chat">
                                     <i class="fas fa-chevron-right" id="chatToggleIcon"></i>
-                                    <span class="slds-assistive-text">Toggle Chat Panel</span>
+                                    <span class="slds-assistive-text">Toggle Chat</span>
                                 </button>
                             </div>
                             
@@ -164,18 +164,12 @@
                             </div>
                             
                             <!-- Chat Input -->
-                            <div class="chat-input-area">
-                                <div class="slds-form-element">
-                                    <div class="slds-form-element__control">
-                                        <textarea class="slds-textarea chat-input" placeholder="Ask VM Agent a question..." rows="3" id="chatInput"></textarea>
-                                    </div>
-                                </div>
-                                <div class="chat-input-actions">
-                                    <button class="slds-button slds-button_brand" onclick="sendMessage()">
-                                        <i class="fas fa-paper-plane slds-m-right_x-small"></i>
-                                        Send
-                                    </button>
-                                </div>
+                            <div class="new-chat-input-area">
+                                <textarea id="chatInput" class="slds-textarea new-chat-input" placeholder="Describe your task or ask a question…" rows="1"></textarea>
+                                <button class="slds-button slds-button_brand new-send-button" onclick="sendMessage()">
+                                    <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                                    <span class="slds-assistive-text">Send</span>
+                                </button>
                             </div>
                         </div>
                     </div>

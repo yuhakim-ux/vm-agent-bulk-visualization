@@ -213,6 +213,12 @@ function openAgentforce() {
         }
     });
     
+    // Auto-resize textarea
+    chatInput.addEventListener('input', () => {
+        chatInput.style.height = 'auto';
+        chatInput.style.height = `${chatInput.scrollHeight}px`;
+    });
+    
     // Initialize the visualization
     renderTreeView();
     renderListView();
@@ -269,7 +275,7 @@ function addMessage(type, content) {
     
     const avatar = document.createElement('div');
     avatar.className = `message-avatar ${type}`;
-    avatar.innerHTML = type === 'agent' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
+    avatar.innerHTML = type === 'agent' ? '<img src="assets/Agentforce Avatar.svg" alt="Agent Avatar">' : '<img src="assets/Avatar.svg" alt="User Avatar">';
     
     const bubble = document.createElement('div');
     bubble.className = 'message-bubble';

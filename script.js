@@ -4,7 +4,7 @@ const sampleData = {
         {
             id: 'init_1',
             name: 'Community Food Drive 2024',
-            status: 'Active',
+            status: 'In Progress',
             startDate: '2024-01-15',
             endDate: '2024-12-31',
             description: 'Year-long community food collection initiative',
@@ -12,7 +12,7 @@ const sampleData = {
                 {
                     id: 'pos_1',
                     name: 'Food Drive Coordinator',
-                    status: 'Active',
+                    status: 'In Progress',
                     skillsRequired: 'Event Planning, Leadership',
                     hoursPerWeek: '10-15',
                     shifts: [
@@ -26,7 +26,7 @@ const sampleData = {
                             assignments: [
                                 { id: 'assign_1', volunteerName: 'Sarah Johnson', email: 'sarah.j@email.com', status: 'Confirmed' },
                                 { id: 'assign_2', volunteerName: 'Mike Chen', email: 'mike.c@email.com', status: 'Confirmed' },
-                                { id: 'assign_3', volunteerName: 'Lisa Rodriguez', email: 'lisa.r@email.com', status: 'Pending' }
+                                { id: 'assign_3', volunteerName: 'Lisa Rodriguez', email: 'lisa.r@email.com', status: 'Upcoming' }
                             ]
                         },
                         {
@@ -111,7 +111,7 @@ function getStatusClass(status) {
         'Confirmed': 'status-confirmed',
         'Pending': 'status-pending',
         'Waitlist': 'status-waitlist',
-        'Cancelled': 'status-cancelled'
+        'Canceled': 'status-canceled'
     };
     return statusClasses[status] || 'status-default';
 }
@@ -198,7 +198,7 @@ function initializeChatMessages() {
     addMessage('user', 'I want to cancel the Community Food Drive 2024 initiative.');
     
     setTimeout(() => {
-        addMessage('agent', 'Canceling the Community Food Drive 2024 initiative will impact a total of 15 records:\n\n• 1 Volunteer Initiative: The initiative will be cancelled\n• 2 Job Positions: All associated positions will be cancelled\n• 3 Job Position Shifts: All scheduled shifts will be removed\n• 9 Job Position Assignments: All volunteer assignments will be cancelled\n\nWould you like to view a detailed visualization to explore the full hierarchy and see which records will be affected?\nOr let me know if you\'d just like to proceed with the cancellation.');
+        addMessage('agent', 'Canceling the Community Food Drive 2024 initiative will impact a total of 15 records:\n\n• 1 Volunteer Initiative: The initiative will be canceled\n• 2 Job Positions: All associated positions will be canceled\n• 3 Job Position Shifts: All scheduled shifts will be removed\n• 9 Job Position Assignments: All volunteer assignments will be canceled\n\nWould you like to view a detailed visualization to explore the full hierarchy and see which records will be affected?\nOr let me know if you\'d just like to proceed with the cancellation.');
     }, 800);
     
     setTimeout(() => {
@@ -249,7 +249,7 @@ function sendMessage() {
             message.toLowerCase().includes('not the initiative')) {
             
             setTimeout(() => {
-                addMessage('agent', 'Got it! Canceling Food Drive Coordinator will impact a total of 8 records:\n\n• 1 Job Position: The position will be cancelled\n• 3 Job Shifts: All scheduled shifts will be removed\n• 4 Job Position Assignments: All volunteer assignments will be cancelled\n\nI\'ve updated the visualization to reflect the impact of canceling this position. Let me know if you\'d like to proceed with the cancellation!');
+                addMessage('agent', 'Got it! Canceling Food Drive Coordinator will impact a total of 8 records:\n\n• 1 Job Position: The position will be canceled\n• 3 Job Shifts: All scheduled shifts will be removed\n• 4 Job Position Assignments: All volunteer assignments will be canceled\n\nI\'ve updated the visualization to reflect the impact of canceling this position. Let me know if you\'d like to proceed with the cancellation!');
                 
                 // Update the visualization to show position-level impact
                 updateVisualizationForPosition();
@@ -631,8 +631,8 @@ function renderInitiativesList() {
         initiatives.push({
             id: initiative.id,
             name: initiative.name,
-            currentStatus: initiative.status,
-            plannedStatus: currentViewMode === 'initiative' ? 'Cancelled' : initiative.status
+                            currentStatus: initiative.status,
+                plannedStatus: currentViewMode === 'initiative' ? 'Canceled' : initiative.status
         });
     });
     
@@ -657,7 +657,7 @@ function renderPositionsList() {
                 id: position.id,
                 name: position.name,
                 currentStatus: position.status,
-                plannedStatus: isAffected ? 'Cancelled' : position.status,
+                plannedStatus: isAffected ? 'Canceled' : position.status,
                 isAffected: isAffected
             });
         });
@@ -685,7 +685,7 @@ function renderShiftsList() {
                     id: shift.id,
                     name: shift.name,
                     currentStatus: shift.status,
-                    plannedStatus: isAffected ? 'Cancelled' : shift.status,
+                    plannedStatus: isAffected ? 'Canceled' : shift.status,
                     isAffected: isAffected
                 });
             });
@@ -715,7 +715,7 @@ function renderAssignmentsList() {
                         id: assignment.id,
                         name: `${shift.name} - ${assignment.volunteerName}`,
                         currentStatus: assignment.status,
-                        plannedStatus: isAffected ? 'Cancelled' : assignment.status,
+                        plannedStatus: isAffected ? 'Canceled' : assignment.status,
                         personAccount: assignment.volunteerName,
                         isAffected: isAffected
                     });
@@ -774,10 +774,10 @@ function createDataTable(type, data, columns) {
             let cellValue = item[column.key] || '';
             let cellClass = '';
             
-            // Handle status columns with proper styling
+            // Handle status columns - keep as plain text
             if (column.key === 'currentStatus' || column.key === 'plannedStatus') {
-                cellClass = `status-cell ${getStatusClass(cellValue)}`;
-                cellValue = `<span class="status-badge ${getStatusClass(cellValue)}">${cellValue}</span>`;
+                cellClass = `status-cell`;
+                // Keep as plain text, no badges
             }
             
             // Handle linked columns
@@ -887,10 +887,10 @@ function sortTable(tableId, column, type, data, columns) {
             let cellValue = item[column.key] || '';
             let cellClass = '';
             
-            // Handle status columns with proper styling
+            // Handle status columns - keep as plain text
             if (column.key === 'currentStatus' || column.key === 'plannedStatus') {
-                cellClass = `status-cell ${getStatusClass(cellValue)}`;
-                cellValue = `<span class="status-badge ${getStatusClass(cellValue)}">${cellValue}</span>`;
+                cellClass = `status-cell`;
+                // Keep as plain text, no badges
             }
             
             // Handle linked columns
@@ -969,14 +969,9 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log(`VM Agent ready - ${totalImpact} total records in sample data`);
 });
 
-// Add CSS for status classes
+// Status classes for basic styling (plain text only)
 const statusStyles = document.createElement('style');
 statusStyles.textContent = `
-    .status-active { background: #e8f5e8; color: #2e844a; }
-    .status-confirmed { background: #e8f4fd; color: #0176d3; }
-    .status-pending { background: #fef7e8; color: #fe9339; }
-    .status-waitlist { background: #f3e8ff; color: #8b5cf6; }
-    .status-cancelled { background: #ffebee; color: #c62d42; }
-    .status-default { background: #f4f6f9; color: #706e6b; }
+    .status-cell { font-weight: 500; color: #3e3e3c; }
 `;
 document.head.appendChild(statusStyles); 

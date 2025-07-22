@@ -718,42 +718,10 @@ body {
     color: #0176d3;
 }
 
-/* Status badges */
-.status-badge {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    font-size: 0.75rem;
+/* Status cells - plain text styling */
+.status-cell {
     font-weight: 500;
-    text-align: center;
-    min-width: 70px;
-    text-transform: none;
-}
-
-/* Status classes */
-.status-active .status-badge {
-    background-color: #45c65a;
-    color: white;
-}
-
-.status-pending .status-badge {
-    background-color: #ffb75d;
-    color: #080707;
-}
-
-.status-cancelled .status-badge {
-    background-color: #ea001e;
-    color: white;
-}
-
-.status-confirmed .status-badge {
-    background-color: #45c65a;
-    color: white;
-}
-
-.status-waitlist .status-badge {
-    background-color: #ffb75d;
-    color: #080707;
+    color: #3e3e3c;
 }
 
 /* Grayed-out rows (not affected by cancellation) */
@@ -766,9 +734,7 @@ body {
     color: #706e6b !important;
 }
 
-.grayed-out-row .status-badge {
-    opacity: 0.7;
-}
+
 
 .grayed-out-row .record-link {
     color: #706e6b !important;

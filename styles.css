@@ -48,18 +48,23 @@ body {
 }
 
 .agentforce-header {
-    background: linear-gradient(90deg, #1B96FF, #0176D3);
-    color: white;
-    border-bottom: none;
+    background: white;
+    color: #080707;
+    border-bottom: 1px solid #e5e5e5;
 }
 
 .agentforce-header .slds-modal__title {
-    color: white;
+    color: #080707;
     font-weight: 600;
 }
 
 .agentforce-header .slds-button_icon {
-    color: white;
+    color: #706e6b;
+}
+
+.agentforce-header .slds-button_icon:hover {
+    background-color: #f3f2f2;
+    color: #080707;
 }
 
 .agentforce-content {

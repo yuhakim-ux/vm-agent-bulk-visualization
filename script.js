@@ -604,9 +604,6 @@ function renderListView() {
 }
 
 function switchTab(tabName) {
-    // Simple test to verify function is called
-    console.log('switchTab called with:', tabName);
-    
     currentTab = tabName;
     
     // Update SLDS tab states
@@ -623,8 +620,6 @@ function switchTab(tabName) {
     if (tabIndex !== -1) {
         document.querySelectorAll('.slds-tabs_default__item')[tabIndex].classList.add('slds-is-active');
         const contentElement = document.getElementById(`${tabName}List`);
-        console.log('Looking for container:', `${tabName}List`);
-        console.log('Found container:', contentElement);
         
         if (contentElement) {
             contentElement.classList.remove('slds-hide');
@@ -633,7 +628,6 @@ function switchTab(tabName) {
             // Render the content for the selected tab
             switch (tabName) {
                 case 'initiatives':
-                    console.log('About to call renderInitiativesList');
                     renderInitiativesList();
                     break;
                 case 'positions':
@@ -646,48 +640,69 @@ function switchTab(tabName) {
                     renderAssignmentsList();
                     break;
             }
-        } else {
-            console.error('Container not found:', `${tabName}List`);
         }
     }
 }
 
 function renderInitiativesList() {
-    try {
-        console.log('renderInitiativesList: Starting...');
-        const container = document.getElementById('initiativesList');
-        console.log('renderInitiativesList: Container found:', container);
-        
-        if (!container) {
-            alert('Container "initiativesList" not found!');
-            return;
-        }
-        
-        console.log('renderInitiativesList: About to check sampleData...');
-        console.log('renderInitiativesList: sampleData:', sampleData);
-        console.log('renderInitiativesList: sampleData.initiatives:', sampleData.initiatives);
-        
-        // Simple test - just put some text
-        const testHtml = '<div style="padding: 20px; background: yellow; border: 2px solid red;"><h3>TEST: renderInitiativesList was called!</h3><p>Container found successfully!</p><p>Sample data has ' + sampleData.initiatives.length + ' initiatives</p></div>';
-        
-        console.log('renderInitiativesList: About to set innerHTML...');
-        container.innerHTML = testHtml;
-        console.log('renderInitiativesList: innerHTML set successfully!');
-        console.log('renderInitiativesList: Container now contains:', container.innerHTML);
-        
-    } catch (error) {
-        console.error('Error in renderInitiativesList:', error);
-        alert('Error in renderInitiativesList: ' + error.message);
-    }
+    const container = document.getElementById('initiativesList');
+    if (!container) return;
+    
+    const initiatives = [];
+    
+    sampleData.initiatives.forEach(initiative => {
+        initiatives.push({
+            id: initiative.id,
+            name: initiative.name,
+            currentStatus: initiative.status,
+            plannedStatus: currentViewMode === 'initiative' ? 'Canceled' : initiative.status
+        });
+    });
+    
+    // Create simple data table that works within SLDS constraints
+    let html = `
+        <div style="padding: 1rem; overflow: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                <thead>
+                    <tr style="background: #f3f2f2; border-bottom: 2px solid #dddbda;">
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Initiative Name</th>
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Current Status</th>
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Planned Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    initiatives.forEach((item, index) => {
+        const bgColor = index % 2 === 0 ? '#fff' : '#fafafa';
+        html += `
+            <tr style="background: ${bgColor}; border-bottom: 1px solid #e5e5e5;">
+                <td style="padding: 12px 8px;">
+                    <a href="#" style="color: #0176d3; text-decoration: none; font-weight: 500;">${item.name}</a>
+                </td>
+                <td style="padding: 12px 8px; font-weight: 500;">${item.currentStatus}</td>
+                <td style="padding: 12px 8px; font-weight: 500;">${item.plannedStatus}</td>
+            </tr>
+        `;
+    });
+    
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    container.innerHTML = html;
 }
 
 function renderPositionsList() {
     const container = document.getElementById('positionsList');
+    if (!container) return;
+    
     const positions = [];
     
     sampleData.initiatives.forEach(initiative => {
         (initiative.positions || []).forEach(position => {
-            // Only show positions that will be affected based on current view mode
             const isAffected = currentViewMode === 'initiative' || 
                               (currentViewMode === 'position' && position.id === 'pos_1');
             
@@ -701,21 +716,51 @@ function renderPositionsList() {
         });
     });
     
-    container.innerHTML = createDataTable('position', positions, [
-        { key: 'name', label: 'Position Name', sortable: true, linked: true },
-        { key: 'currentStatus', label: 'Current Status', sortable: true },
-        { key: 'plannedStatus', label: 'Planned Status', sortable: true }
-    ]);
+    let html = `
+        <div style="padding: 1rem; overflow: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                <thead>
+                    <tr style="background: #f3f2f2; border-bottom: 2px solid #dddbda;">
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Position Name</th>
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Current Status</th>
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Planned Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    positions.forEach((item, index) => {
+        const bgColor = index % 2 === 0 ? '#fff' : '#fafafa';
+        const rowStyle = item.isAffected === false ? 'opacity: 0.5;' : '';
+        html += `
+            <tr style="background: ${bgColor}; border-bottom: 1px solid #e5e5e5; ${rowStyle}">
+                <td style="padding: 12px 8px;">
+                    <a href="#" style="color: #0176d3; text-decoration: none; font-weight: 500;">${item.name}</a>
+                </td>
+                <td style="padding: 12px 8px; font-weight: 500;">${item.currentStatus}</td>
+                <td style="padding: 12px 8px; font-weight: 500;">${item.plannedStatus}</td>
+            </tr>
+        `;
+    });
+    
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    container.innerHTML = html;
 }
 
 function renderShiftsList() {
     const container = document.getElementById('shiftsList');
+    if (!container) return;
+    
     const shifts = [];
     
     sampleData.initiatives.forEach(initiative => {
         (initiative.positions || []).forEach(position => {
             (position.shifts || []).forEach(shift => {
-                // Only show shifts that will be affected based on current view mode
                 const isAffected = currentViewMode === 'initiative' || 
                                   (currentViewMode === 'position' && position.id === 'pos_1');
                 
@@ -730,22 +775,52 @@ function renderShiftsList() {
         });
     });
     
-    container.innerHTML = createDataTable('shift', shifts, [
-        { key: 'name', label: 'Shift Name', sortable: true, linked: true },
-        { key: 'currentStatus', label: 'Current Status', sortable: true },
-        { key: 'plannedStatus', label: 'Planned Status', sortable: true }
-    ]);
+    let html = `
+        <div style="padding: 1rem; overflow: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                <thead>
+                    <tr style="background: #f3f2f2; border-bottom: 2px solid #dddbda;">
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Shift Name</th>
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Current Status</th>
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Planned Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    shifts.forEach((item, index) => {
+        const bgColor = index % 2 === 0 ? '#fff' : '#fafafa';
+        const rowStyle = item.isAffected === false ? 'opacity: 0.5;' : '';
+        html += `
+            <tr style="background: ${bgColor}; border-bottom: 1px solid #e5e5e5; ${rowStyle}">
+                <td style="padding: 12px 8px;">
+                    <a href="#" style="color: #0176d3; text-decoration: none; font-weight: 500;">${item.name}</a>
+                </td>
+                <td style="padding: 12px 8px; font-weight: 500;">${item.currentStatus}</td>
+                <td style="padding: 12px 8px; font-weight: 500;">${item.plannedStatus}</td>
+            </tr>
+        `;
+    });
+    
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    container.innerHTML = html;
 }
 
 function renderAssignmentsList() {
     const container = document.getElementById('assignmentsList');
+    if (!container) return;
+    
     const assignments = [];
     
     sampleData.initiatives.forEach(initiative => {
         (initiative.positions || []).forEach(position => {
             (position.shifts || []).forEach(shift => {
                 (shift.assignments || []).forEach(assignment => {
-                    // Only show assignments that will be affected based on current view mode
                     const isAffected = currentViewMode === 'initiative' || 
                                       (currentViewMode === 'position' && position.id === 'pos_1');
                     
@@ -762,12 +837,44 @@ function renderAssignmentsList() {
         });
     });
     
-    container.innerHTML = createDataTable('assignment', assignments, [
-        { key: 'name', label: 'Assignment', sortable: true, linked: true },
-        { key: 'currentStatus', label: 'Current Status', sortable: true },
-        { key: 'plannedStatus', label: 'Planned Status', sortable: true },
-        { key: 'personAccount', label: 'Person Account', sortable: true, linked: true }
-    ]);
+    let html = `
+        <div style="padding: 1rem; overflow: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                <thead>
+                    <tr style="background: #f3f2f2; border-bottom: 2px solid #dddbda;">
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Assignment</th>
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Current Status</th>
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Planned Status</th>
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Person Account</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    assignments.forEach((item, index) => {
+        const bgColor = index % 2 === 0 ? '#fff' : '#fafafa';
+        const rowStyle = item.isAffected === false ? 'opacity: 0.5;' : '';
+        html += `
+            <tr style="background: ${bgColor}; border-bottom: 1px solid #e5e5e5; ${rowStyle}">
+                <td style="padding: 12px 8px;">
+                    <a href="#" style="color: #0176d3; text-decoration: none; font-weight: 500;">${item.name}</a>
+                </td>
+                <td style="padding: 12px 8px; font-weight: 500;">${item.currentStatus}</td>
+                <td style="padding: 12px 8px; font-weight: 500;">${item.plannedStatus}</td>
+                <td style="padding: 12px 8px;">
+                    <a href="#" style="color: #0176d3; text-decoration: none; font-weight: 500;">${item.personAccount}</a>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    container.innerHTML = html;
 }
 
 // Data Table Creation Functions

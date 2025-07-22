@@ -274,19 +274,9 @@ body {
     border-top: 1px solid #e5e5e5;
     padding: 1rem 1.5rem;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-    flex-wrap: wrap;
     gap: 1rem;
-}
-
-.footer-summary {
-    flex: 1;
-}
-
-.footer-summary .total-impact {
-    font-weight: 600;
-    color: #080707;
 }
 
 .footer-actions {

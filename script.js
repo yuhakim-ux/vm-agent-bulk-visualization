@@ -67,50 +67,6 @@ const sampleData = {
                     ]
                 }
             ]
-        },
-        {
-            id: 'init_2',
-            name: 'Youth Mentorship Program',
-            status: 'Active',
-            startDate: '2024-02-01',
-            endDate: '2024-11-30',
-            description: 'After-school mentorship and tutoring program',
-            positions: [
-                {
-                    id: 'pos_3',
-                    name: 'Academic Tutor',
-                    status: 'Active',
-                    skillsRequired: 'Teaching Experience, Math/Science',
-                    hoursPerWeek: '6-8',
-                    shifts: [
-                        {
-                            id: 'shift_4',
-                            name: 'Monday Math Tutoring',
-                            startTime: '2024-03-04T15:30:00',
-                            endTime: '2024-03-04T17:30:00',
-                            location: 'Lincoln Elementary School',
-                            status: 'Active',
-                            assignments: [
-                                { id: 'assign_10', volunteerName: 'Dr. Patricia Green', email: 'patricia.g@email.com', status: 'Confirmed' },
-                                { id: 'assign_11', volunteerName: 'Tom Anderson', email: 'tom.a@email.com', status: 'Confirmed' }
-                            ]
-                        },
-                        {
-                            id: 'shift_5',
-                            name: 'Wednesday Science Lab',
-                            startTime: '2024-03-06T15:30:00',
-                            endTime: '2024-03-06T17:30:00',
-                            location: 'Lincoln Elementary School',
-                            status: 'Active',
-                            assignments: [
-                                { id: 'assign_12', volunteerName: 'Jennifer Lee', email: 'jennifer.l@email.com', status: 'Confirmed' },
-                                { id: 'assign_13', volunteerName: 'Carlos Martinez', email: 'carlos.m@email.com', status: 'Pending' },
-                                { id: 'assign_14', volunteerName: 'Michelle Brown', email: 'michelle.b@email.com', status: 'Confirmed' }
-                            ]
-                        }
-                    ]
-                }
-            ]
         }
     ]
 };
@@ -118,7 +74,7 @@ const sampleData = {
 // Global state
 let currentView = 'tree';
 let currentTab = 'initiatives';
-let expandedNodes = new Set(['init_1', 'init_2']); // Initially expand root nodes
+let expandedNodes = new Set(['init_1']); // Initially expand root nodes
 let isChatPanelCollapsed = false;
 
 // Utility functions
@@ -228,7 +184,7 @@ function initializeChatMessages() {
     }, 500);
     
     setTimeout(() => {
-        addMessage('agent', 'Analysis complete! Canceling the Community Food Drive 2024 initiative will affect:\n\n• 2 Job Positions\n• 3 Job Position Shifts  \n• 9 Job Position Assignments\n\nI\'ve opened the detailed visualization on the right so you can explore the full hierarchy and see exactly which records will be updated.');
+        addMessage('agent', 'Analysis complete! Canceling the Community Food Drive 2024 initiative will affect:\n\n• 2 Job Positions\n• 3 Job Position Shifts  \n• 9 Job Position Assignments\n\nI\'ve opened the detailed visualization on the left so you can explore the full hierarchy and see exactly which records will be updated.');
     }, 1500);
 }
 
@@ -548,7 +504,7 @@ function expandAll() {
 }
 
 function collapseAll() {
-    // Keep only root initiatives expanded
+    // Keep only root initiative expanded
     expandedNodes.clear();
     sampleData.initiatives.forEach(initiative => {
         expandedNodes.add(initiative.id);

@@ -207,11 +207,11 @@ function toggleChatPanel() {
     if (isChatPanelCollapsed) {
         chatPanel.classList.add('collapsed');
         chatExpandBtn.style.display = 'block';
-        chatToggleIcon.className = 'fas fa-chevron-right';
+        chatToggleIcon.className = 'fas fa-chevron-left';
     } else {
         chatPanel.classList.remove('collapsed');
         chatExpandBtn.style.display = 'none';
-        chatToggleIcon.className = 'fas fa-chevron-left';
+        chatToggleIcon.className = 'fas fa-chevron-right';
     }
 }
 

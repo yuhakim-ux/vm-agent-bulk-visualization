@@ -41,38 +41,6 @@
                     
                     <!-- Modal Body - Main Content Area -->
                     <div class="slds-modal__content agentforce-content">
-                        <!-- Collapsible Chat Panel -->
-                        <div class="chat-panel" id="chatPanel">
-                            <!-- Chat Panel Header -->
-                            <div class="chat-panel-header">
-                                <h3 class="slds-text-heading_small">Conversation</h3>
-                                <button class="slds-button slds-button_icon chat-toggle" onclick="toggleChatPanel()" title="Collapse Chat">
-                                    <i class="fas fa-chevron-left" id="chatToggleIcon"></i>
-                                    <span class="slds-assistive-text">Toggle Chat Panel</span>
-                                </button>
-                            </div>
-                            
-                            <!-- Chat Messages -->
-                            <div class="chat-messages" id="chatMessages">
-                                <!-- Messages will be populated by JS -->
-                            </div>
-                            
-                            <!-- Chat Input -->
-                            <div class="chat-input-area">
-                                <div class="slds-form-element">
-                                    <div class="slds-form-element__control">
-                                        <textarea class="slds-textarea chat-input" placeholder="Ask VM Agent a question..." rows="3" id="chatInput"></textarea>
-                                    </div>
-                                </div>
-                                <div class="chat-input-actions">
-                                    <button class="slds-button slds-button_brand" onclick="sendMessage()">
-                                        <i class="fas fa-paper-plane slds-m-right_x-small"></i>
-                                        Send
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
                         <!-- Visualization Area -->
                         <div class="visualization-area" id="visualizationArea">
                             <!-- Expand Chat Button (when collapsed) -->
@@ -154,6 +122,38 @@
                                             <div id="assignmentsList" class="slds-tabs_default__content slds-hide"></div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Collapsible Chat Panel -->
+                        <div class="chat-panel" id="chatPanel">
+                            <!-- Chat Panel Header -->
+                            <div class="chat-panel-header">
+                                <h3 class="slds-text-heading_small">Conversation</h3>
+                                <button class="slds-button slds-button_icon chat-toggle" onclick="toggleChatPanel()" title="Collapse Chat">
+                                    <i class="fas fa-chevron-right" id="chatToggleIcon"></i>
+                                    <span class="slds-assistive-text">Toggle Chat Panel</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Chat Messages -->
+                            <div class="chat-messages" id="chatMessages">
+                                <!-- Messages will be populated by JS -->
+                            </div>
+                            
+                            <!-- Chat Input -->
+                            <div class="chat-input-area">
+                                <div class="slds-form-element">
+                                    <div class="slds-form-element__control">
+                                        <textarea class="slds-textarea chat-input" placeholder="Ask VM Agent a question..." rows="3" id="chatInput"></textarea>
+                                    </div>
+                                </div>
+                                <div class="chat-input-actions">
+                                    <button class="slds-button slds-button_brand" onclick="sendMessage()">
+                                        <i class="fas fa-paper-plane slds-m-right_x-small"></i>
+                                        Send
+                                    </button>
                                 </div>
                             </div>
                         </div>

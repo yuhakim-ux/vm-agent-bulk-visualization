@@ -209,6 +209,13 @@ function renderTreeView() {
     const container = document.getElementById('hierarchyTree');
     container.innerHTML = '';
     
+    // Add header for volunteer initiatives
+    if (sampleData.initiatives.length > 0) {
+        const initiativesHeader = createSectionHeader('initiative', sampleData.initiatives.length);
+        initiativesHeader.style.marginLeft = '0'; // Remove left margin for top level
+        container.appendChild(initiativesHeader);
+    }
+    
     sampleData.initiatives.forEach(initiative => {
         const initiativeNode = createTreeNode(initiative, 'initiative', 'root');
         container.appendChild(initiativeNode);
@@ -322,10 +329,56 @@ function renderChildren(container, parent, parentType) {
             break;
     }
     
+    // Add section header if there are children
+    if (children.length > 0) {
+        const sectionHeader = createSectionHeader(childType, children.length);
+        container.appendChild(sectionHeader);
+    }
+    
     children.forEach(child => {
         const childNode = createTreeNode(child, childType);
         container.appendChild(childNode);
     });
+}
+
+function createSectionHeader(recordType, count) {
+    const header = document.createElement('div');
+    header.className = 'section-header';
+    
+    const typeInfo = getSectionHeaderInfo(recordType);
+    
+    header.innerHTML = `
+        <div class="section-header-content">
+            <span class="section-icon">${typeInfo.icon}</span>
+            <span class="section-title">${typeInfo.title}</span>
+            <span class="section-count">${count}</span>
+        </div>
+    `;
+    
+    return header;
+}
+
+function getSectionHeaderInfo(recordType) {
+    const headerInfo = {
+        'initiative': {
+            icon: '<i class="fas fa-heart"></i>',
+            title: 'Volunteer Initiatives'
+        },
+        'position': {
+            icon: '<i class="fas fa-briefcase"></i>',
+            title: 'Job Positions'
+        },
+        'shift': {
+            icon: '<i class="fas fa-clock"></i>',
+            title: 'Job Position Shifts'
+        },
+        'assignment': {
+            icon: '<i class="fas fa-user"></i>',
+            title: 'Job Position Assignments'
+        }
+    };
+    
+    return headerInfo[recordType] || { icon: '<i class="fas fa-circle"></i>', title: 'Records' };
 }
 
 function toggleNode(nodeId, childrenDiv) {

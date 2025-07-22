@@ -25,8 +25,7 @@ const sampleData = {
                             status: 'Active',
                             assignments: [
                                 { id: 'assign_1', volunteerName: 'Sarah Johnson', email: 'sarah.j@email.com', status: 'Confirmed' },
-                                { id: 'assign_2', volunteerName: 'Mike Chen', email: 'mike.c@email.com', status: 'Confirmed' },
-                                { id: 'assign_3', volunteerName: 'Lisa Rodriguez', email: 'lisa.r@email.com', status: 'Pending' }
+                                { id: 'assign_2', volunteerName: 'Mike Chen', email: 'mike.c@email.com', status: 'Confirmed' }
                             ]
                         },
                         {
@@ -152,6 +151,7 @@ function updateVisualizationForPosition() {
     
     // Update tooltip
     updateTooltipContent();
+    updateTabCounts();
     
     // Update expanded nodes for position view
     expandedNodes.clear();
@@ -178,7 +178,7 @@ function updateTooltipContent() {
             The parent Volunteer Initiative will not be affected.
         `;
     } else {
-        tooltipTitle.textContent = '15 records will be updated';
+        tooltipTitle.textContent = '14 records will be updated';
         tooltipDescription.innerHTML = `
             Canceling this Volunteer Initiative will cascade to related records:
             <ul>
@@ -199,6 +199,7 @@ function openAgentforce() {
     // Reset view and update tooltip to default
     currentViewMode = 'initiative';
     updateTooltipContent();
+    updateTabCounts();
     
     // Initialize chat messages
     initializeChatMessages();
@@ -253,7 +254,7 @@ function initializeChatMessages() {
     addMessage('user', 'I want to cancel the Community Food Drive 2024 initiative.');
     
     setTimeout(() => {
-        addMessage('agent', 'Canceling the Community Food Drive 2024 initiative will impact a total of 15 records:\n\n• 1 Volunteer Initiative: The initiative will be cancelled\n• 2 Job Positions: All associated positions will be cancelled\n• 3 Job Position Shifts: All scheduled shifts will be removed\n• 9 Job Position Assignments: All volunteer assignments will be cancelled\n\nWould you like to view a detailed visualization to explore the full hierarchy and see which records will be affected?\nOr let me know if you\'d just like to proceed with the cancellation.');
+        addMessage('agent', 'Canceling the Community Food Drive 2024 initiative will impact a total of 14 records:\n\n• 1 Volunteer Initiative: The initiative will be cancelled\n• 2 Job Positions: All associated positions will be cancelled\n• 4 Job Position Shifts: All scheduled shifts will be removed\n• 7 Job Position Assignments: All volunteer assignments will be cancelled\n\nWould you like to view a detailed visualization to explore the full hierarchy and see which records will be affected?\nOr let me know if you\'d just like to proceed with the cancellation.');
     }, 800);
     
     setTimeout(() => {
@@ -628,10 +629,29 @@ function collapseAll() {
 
 // List view functions
 function renderListView() {
+    updateTabCounts();
     renderInitiativesList();
     renderPositionsList();
     renderShiftsList();
     renderAssignmentsList();
+}
+
+function updateTabCounts() {
+    const isPositionView = currentViewMode === 'position';
+    
+    const counts = {
+        initiatives: isPositionView ? 0 : 1,
+        positions: isPositionView ? 1 : sampleData.initiatives[0].positions.length,
+        shifts: isPositionView ? 3 : sampleData.initiatives[0].positions.reduce((acc, pos) => acc + pos.shifts.length, 0),
+        assignments: isPositionView ? 4 : sampleData.initiatives[0].positions.reduce((acc, pos) => {
+            return acc + pos.shifts.reduce((shiftAcc, shift) => shiftAcc + shift.assignments.length, 0);
+        }, 0)
+    };
+    
+    document.querySelector('a[onclick="switchTab(\'initiatives\')"]').innerHTML = `<i class="fas fa-heart slds-m-right_x-small"></i> Volunteer Initiatives (${counts.initiatives})`;
+    document.querySelector('a[onclick="switchTab(\'positions\')"]').innerHTML = `<i class="fas fa-briefcase slds-m-right_x-small"></i> Job Positions (${counts.positions})`;
+    document.querySelector('a[onclick="switchTab(\'shifts\')"]').innerHTML = `<i class="fas fa-clock slds-m-right_x-small"></i> Job Shifts (${counts.shifts})`;
+    document.querySelector('a[onclick="switchTab(\'assignments\')"]').innerHTML = `<i class="fas fa-users slds-m-right_x-small"></i> Assignments (${counts.assignments})`;
 }
 
 function switchTab(tabName) {

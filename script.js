@@ -119,6 +119,7 @@ const sampleData = {
 let currentView = 'tree';
 let currentTab = 'initiatives';
 let expandedNodes = new Set(['init_1', 'init_2']); // Initially expand root nodes
+let isChatPanelCollapsed = false;
 
 // Utility functions
 function formatDate(dateString) {
@@ -174,27 +175,117 @@ function calculateTotals() {
     return totals;
 }
 
-// Modal functions
-function openVisualization() {
-    document.getElementById('modalOverlay').classList.add('active');
+// Agentforce Modal functions
+function openAgentforce() {
+    document.getElementById('agentforceModal').style.display = 'block';
     document.body.style.overflow = 'hidden';
     
-    // Initialize the tree view
+    // Initialize chat messages
+    initializeChatMessages();
+    
+    // Initialize the visualization
     renderTreeView();
     renderListView();
+    
+    // Set initial view state
+    switchView('tree');
 }
 
-function closeVisualization() {
-    document.getElementById('modalOverlay').classList.remove('active');
+function closeAgentforce() {
+    document.getElementById('agentforceModal').style.display = 'none';
     document.body.style.overflow = 'auto';
+}
+
+// Chat Panel functions
+function toggleChatPanel() {
+    const chatPanel = document.getElementById('chatPanel');
+    const chatExpandBtn = document.getElementById('chatExpandBtn');
+    const chatToggleIcon = document.getElementById('chatToggleIcon');
+    
+    isChatPanelCollapsed = !isChatPanelCollapsed;
+    
+    if (isChatPanelCollapsed) {
+        chatPanel.classList.add('collapsed');
+        chatExpandBtn.style.display = 'block';
+        chatToggleIcon.className = 'fas fa-chevron-right';
+    } else {
+        chatPanel.classList.remove('collapsed');
+        chatExpandBtn.style.display = 'none';
+        chatToggleIcon.className = 'fas fa-chevron-left';
+    }
+}
+
+// Chat Message functions
+function initializeChatMessages() {
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.innerHTML = '';
+    
+    // Add initial messages
+    addMessage('user', 'I want to cancel the Community Food Drive 2024 initiative. Can you show me what will be affected?');
+    
+    setTimeout(() => {
+        addMessage('agent', 'I\'ll analyze the impact of canceling that initiative. Let me check all the related records...');
+    }, 500);
+    
+    setTimeout(() => {
+        addMessage('agent', 'Analysis complete! Canceling the Community Food Drive 2024 initiative will affect:\n\n• 2 Job Positions\n• 3 Job Position Shifts  \n• 9 Job Position Assignments\n\nI\'ve opened the detailed visualization on the right so you can explore the full hierarchy and see exactly which records will be updated.');
+    }, 1500);
+}
+
+function addMessage(type, content) {
+    const chatMessages = document.getElementById('chatMessages');
+    const message = document.createElement('div');
+    message.className = `message ${type}-message`;
+    
+    const avatar = document.createElement('div');
+    avatar.className = `message-avatar ${type}`;
+    avatar.innerHTML = type === 'agent' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
+    
+    const bubble = document.createElement('div');
+    bubble.className = 'message-bubble';
+    bubble.innerHTML = content.replace(/\n/g, '<br>');
+    
+    const messageContent = document.createElement('div');
+    messageContent.style.flex = '1';
+    messageContent.appendChild(bubble);
+    
+    // Add timestamp
+    const time = document.createElement('div');
+    time.className = 'message-time';
+    time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    messageContent.appendChild(time);
+    
+    message.appendChild(avatar);
+    message.appendChild(messageContent);
+    
+    chatMessages.appendChild(message);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    
+    if (message) {
+        addMessage('user', message);
+        input.value = '';
+        
+        // Simulate agent response
+        setTimeout(() => {
+            addMessage('agent', 'I understand your question. The visualization on the right shows the current analysis. Is there anything specific you\'d like me to explain about the impact?');
+        }, 1000);
+    }
 }
 
 function switchView(view) {
     currentView = view;
     
-    // Update button states
-    document.getElementById('treeViewBtn').classList.toggle('active', view === 'tree');
-    document.getElementById('listViewBtn').classList.toggle('active', view === 'list');
+    // Update button states using SLDS classes
+    const treeBtn = document.getElementById('treeViewBtn');
+    const listBtn = document.getElementById('listViewBtn');
+    
+    treeBtn.classList.toggle('active', view === 'tree');
+    listBtn.classList.toggle('active', view === 'list');
     
     // Show/hide views
     document.getElementById('treeView').style.display = view === 'tree' ? 'block' : 'none';
@@ -476,17 +567,25 @@ function renderListView() {
 function switchTab(tabName) {
     currentTab = tabName;
     
-    // Update tab states
-    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+    // Update SLDS tab states
+    document.querySelectorAll('.slds-tabs_default__item').forEach(item => item.classList.remove('slds-is-active'));
+    document.querySelectorAll('.slds-tabs_default__content').forEach(content => {
+        content.classList.remove('slds-show');
+        content.classList.add('slds-hide');
+    });
     
-    document.querySelector(`.tab:nth-child(${getTabIndex(tabName)})`).classList.add('active');
-    document.getElementById(`${tabName}List`).classList.add('active');
-}
-
-function getTabIndex(tabName) {
+    // Find and activate the correct tab
     const tabs = ['initiatives', 'positions', 'shifts', 'assignments'];
-    return tabs.indexOf(tabName) + 1;
+    const tabIndex = tabs.indexOf(tabName);
+    
+    if (tabIndex !== -1) {
+        document.querySelectorAll('.slds-tabs_default__item')[tabIndex].classList.add('slds-is-active');
+        const contentElement = document.getElementById(`${tabName}List`);
+        if (contentElement) {
+            contentElement.classList.remove('slds-hide');
+            contentElement.classList.add('slds-show');
+        }
+    }
 }
 
 function renderInitiativesList() {
@@ -633,32 +732,30 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.total-impact').textContent = `Total Impact: ${totalImpact} records will be updated`;
     
     // Close modal when clicking outside
-    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    document.getElementById('agentforceModal').addEventListener('click', function(e) {
         if (e.target === this) {
-            closeVisualization();
+            closeAgentforce();
         }
     });
     
     // Keyboard support
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && document.getElementById('modalOverlay').classList.contains('active')) {
-            closeVisualization();
+        const modal = document.getElementById('agentforceModal');
+        if (e.key === 'Escape' && modal.style.display === 'block') {
+            closeAgentforce();
+        }
+        
+        // Enter to send message when input is focused
+        if (e.key === 'Enter' && e.target.id === 'chatInput') {
+            if (!e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
         }
     });
     
-    // Add some dynamic messaging to the chat
-    setTimeout(() => {
-        const chatMessages = document.getElementById('chatMessages');
-        const newMessage = document.createElement('div');
-        newMessage.className = 'message bot-message fade-in';
-        newMessage.innerHTML = `
-            <div class="message-content">
-                <p>Analysis complete! I found <strong>${totalImpact} total records</strong> that will be affected by this bulk cancellation. Please review the impact summary below.</p>
-            </div>
-        `;
-        chatMessages.appendChild(newMessage);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }, 1500);
+    // Initialize with correct totals for the demo
+    console.log(`VM Agent ready - ${totalImpact} total records in sample data`);
 });
 
 // Add CSS for status classes

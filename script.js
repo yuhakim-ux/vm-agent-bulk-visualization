@@ -603,24 +603,24 @@ function renderListView() {
 function switchTab(tabName) {
     currentTab = tabName;
     
-    // Update SLDS tab states
-    document.querySelectorAll('.slds-tabs_default__item').forEach(item => item.classList.remove('slds-is-active'));
-    document.querySelectorAll('.slds-tabs_default__content').forEach(content => {
-        content.classList.remove('slds-show');
-        content.classList.add('slds-hide');
+    // Deactivate all tabs and hide all content panels
+    document.querySelectorAll('.slds-tabs_default__item').forEach(tab => {
+        tab.classList.remove('slds-is-active');
+    });
+    document.querySelectorAll('.slds-tabs_default__content').forEach(panel => {
+        panel.classList.remove('slds-show');
+        panel.classList.add('slds-hide');
     });
     
-    // Find and activate the correct tab
-    const tabs = ['initiatives', 'positions', 'shifts', 'assignments'];
-    const tabIndex = tabs.indexOf(tabName);
-    
-    if (tabIndex !== -1) {
-        document.querySelectorAll('.slds-tabs_default__item')[tabIndex].classList.add('slds-is-active');
-        const contentElement = document.getElementById(`${tabName}List`);
-        if (contentElement) {
-            contentElement.classList.remove('slds-hide');
-            contentElement.classList.add('slds-show');
-        }
+    // Activate the selected tab and show its content panel
+    const selectedTab = document.querySelector(`.slds-tabs_default__item a[onclick="switchTab('${tabName}')"]`);
+    if (selectedTab) {
+        selectedTab.parentElement.classList.add('slds-is-active');
+    }
+    const selectedPanel = document.getElementById(`${tabName}List`);
+    if (selectedPanel) {
+        selectedPanel.classList.remove('slds-hide');
+        selectedPanel.classList.add('slds-show');
     }
 }
 

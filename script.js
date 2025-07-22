@@ -180,7 +180,7 @@ function initializeChatMessages() {
     addMessage('user', 'I want to cancel the Community Food Drive 2024 initiative.');
     
     setTimeout(() => {
-        addMessage('agent', 'Canceling the Community Food Drive 2024 initiative will impact a total of 15 records:\n\n• 1 Volunteer Initiative\n• 2 Job Positions: All associated positions will be cancelled\n• 3 Job Position Shifts: All scheduled shifts will be removed\n• 9 Job Position Assignments: All volunteer assignments will be cancelled\n\nWould you like to view a detailed visualization to explore the full hierarchy and see which records will be affected?\nOr let me know if you\'d just like to proceed with the cancellation.');
+        addMessage('agent', 'Canceling the Community Food Drive 2024 initiative will impact a total of 15 records:\n\n• 1 Volunteer Initiative: The initiative will be cancelled\n• 2 Job Positions: All associated positions will be cancelled\n• 3 Job Position Shifts: All scheduled shifts will be removed\n• 9 Job Position Assignments: All volunteer assignments will be cancelled\n\nWould you like to view a detailed visualization to explore the full hierarchy and see which records will be affected?\nOr let me know if you\'d just like to proceed with the cancellation.');
     }, 800);
     
     setTimeout(() => {

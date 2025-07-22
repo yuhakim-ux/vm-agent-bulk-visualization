@@ -29,9 +29,31 @@
                 <div class="slds-modal__container">
                     <!-- Modal Header -->
                     <div class="slds-modal__header agentforce-header">
-                        <h2 class="slds-modal__title slds-hyphenate">
-                            Preview Bulk Update
-                        </h2>
+                        <div class="header-left">
+                            <h2 class="slds-modal__title slds-hyphenate">
+                                Preview Bulk Update
+                            </h2>
+                            <div class="tooltip-container">
+                                <button class="info-tooltip-trigger" aria-describedby="bulk-update-tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                                <div class="custom-tooltip" id="bulk-update-tooltip" role="tooltip">
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-title">15 records will be updated</div>
+                                        <div class="tooltip-description">
+                                            Canceling this Volunteer Initiative will cascade to related records:
+                                            <ul>
+                                                <li><strong>Job Positions:</strong> All associated positions will be cancelled</li>
+                                                <li><strong>Job Shifts:</strong> All scheduled shifts will be removed</li>
+                                                <li><strong>Assignments:</strong> All volunteer assignments will be cancelled</li>
+                                            </ul>
+                                            This action cannot be undone.
+                                        </div>
+                                    </div>
+                                    <div class="tooltip-arrow"></div>
+                                </div>
+                            </div>
+                        </div>
                         <button class="slds-button slds-button_icon slds-modal__close" onclick="closeAgentforce()">
                             <i class="fas fa-times"></i>
                             <span class="slds-assistive-text">Close</span>

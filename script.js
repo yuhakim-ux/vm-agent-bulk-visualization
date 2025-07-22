@@ -4,7 +4,7 @@ const sampleData = {
         {
             id: 'init_1',
             name: 'Community Food Drive 2024',
-            status: 'In Progress',
+            status: 'Active',
             startDate: '2024-01-15',
             endDate: '2024-12-31',
             description: 'Year-long community food collection initiative',
@@ -12,7 +12,7 @@ const sampleData = {
                 {
                     id: 'pos_1',
                     name: 'Food Drive Coordinator',
-                    status: 'In Progress',
+                    status: 'Active',
                     skillsRequired: 'Event Planning, Leadership',
                     hoursPerWeek: '10-15',
                     shifts: [
@@ -26,7 +26,7 @@ const sampleData = {
                             assignments: [
                                 { id: 'assign_1', volunteerName: 'Sarah Johnson', email: 'sarah.j@email.com', status: 'Confirmed' },
                                 { id: 'assign_2', volunteerName: 'Mike Chen', email: 'mike.c@email.com', status: 'Confirmed' },
-                                { id: 'assign_3', volunteerName: 'Lisa Rodriguez', email: 'lisa.r@email.com', status: 'Upcoming' }
+                                { id: 'assign_3', volunteerName: 'Lisa Rodriguez', email: 'lisa.r@email.com', status: 'Pending' }
                             ]
                         },
                         {
@@ -61,7 +61,7 @@ const sampleData = {
                     hoursPerWeek: '8-12',
                     shifts: [
                         {
-                            id: 'shift_3',
+                            id: 'shift_4',
                             name: 'Morning Collection Shift',
                             startTime: '2024-03-02T09:00:00',
                             endTime: '2024-03-02T13:00:00',
@@ -69,7 +69,8 @@ const sampleData = {
                             status: 'Active',
                             assignments: [
                                 { id: 'assign_8', volunteerName: 'Robert Davis', email: 'robert.d@email.com', status: 'Confirmed' },
-                                { id: 'assign_9', volunteerName: 'Karen White', email: 'karen.w@email.com', status: 'Confirmed' }
+                                { id: 'assign_9', volunteerName: 'Karen White', email: 'karen.w@email.com', status: 'Confirmed' },
+                                { id: 'assign_10', volunteerName: 'John Smith', email: 'john.s@email.com', status: 'Confirmed' }
                             ]
                         }
                     ]
@@ -111,7 +112,7 @@ function getStatusClass(status) {
         'Confirmed': 'status-confirmed',
         'Pending': 'status-pending',
         'Waitlist': 'status-waitlist',
-        'Canceled': 'status-canceled'
+        'Cancelled': 'status-cancelled'
     };
     return statusClasses[status] || 'status-default';
 }
@@ -157,8 +158,9 @@ function openAgentforce() {
         }
     });
     
-    // Initialize the tree visualization only
+    // Initialize the visualization
     renderTreeView();
+    renderListView();
     
     // Set initial view state
     switchView('tree');
@@ -197,7 +199,7 @@ function initializeChatMessages() {
     addMessage('user', 'I want to cancel the Community Food Drive 2024 initiative.');
     
     setTimeout(() => {
-        addMessage('agent', 'Canceling the Community Food Drive 2024 initiative will impact a total of 15 records:\n\n• 1 Volunteer Initiative: The initiative will be canceled\n• 2 Job Positions: All associated positions will be canceled\n• 3 Job Position Shifts: All scheduled shifts will be removed\n• 9 Job Position Assignments: All volunteer assignments will be canceled\n\nWould you like to view a detailed visualization to explore the full hierarchy and see which records will be affected?\nOr let me know if you\'d just like to proceed with the cancellation.');
+        addMessage('agent', 'Canceling the Community Food Drive 2024 initiative will impact a total of 15 records:\n\n• 1 Volunteer Initiative: The initiative will be cancelled\n• 2 Job Positions: All associated positions will be cancelled\n• 3 Job Position Shifts: All scheduled shifts will be removed\n• 9 Job Position Assignments: All volunteer assignments will be cancelled\n\nWould you like to view a detailed visualization to explore the full hierarchy and see which records will be affected?\nOr let me know if you\'d just like to proceed with the cancellation.');
     }, 800);
     
     setTimeout(() => {
@@ -248,7 +250,7 @@ function sendMessage() {
             message.toLowerCase().includes('not the initiative')) {
             
             setTimeout(() => {
-                addMessage('agent', 'Got it! Canceling Food Drive Coordinator will impact a total of 8 records:\n\n• 1 Job Position: The position will be canceled\n• 3 Job Shifts: All scheduled shifts will be removed\n• 4 Job Position Assignments: All volunteer assignments will be canceled\n\nI\'ve updated the visualization to reflect the impact of canceling this position. Let me know if you\'d like to proceed with the cancellation!');
+                addMessage('agent', 'Got it! Canceling Food Drive Coordinator will impact a total of 8 records:\n\n• 1 Job Position: The position will be cancelled\n• 3 Job Shifts: All scheduled shifts will be removed\n• 4 Job Position Assignments: All volunteer assignments will be cancelled\n\nI\'ve updated the visualization to reflect the impact of canceling this position. Let me know if you\'d like to proceed with the cancellation!');
                 
                 // Update the visualization to show position-level impact
                 updateVisualizationForPosition();
@@ -317,11 +319,6 @@ function switchView(view) {
     
     // Show/hide tree controls
     document.getElementById('treeControls').style.display = view === 'tree' ? 'flex' : 'none';
-    
-    // Initialize the first tab when switching to List View
-    if (view === 'list') {
-        switchTab('initiatives');
-    }
 }
 
 // Tree view functions
@@ -620,162 +617,106 @@ function switchTab(tabName) {
     if (tabIndex !== -1) {
         document.querySelectorAll('.slds-tabs_default__item')[tabIndex].classList.add('slds-is-active');
         const contentElement = document.getElementById(`${tabName}List`);
-        
         if (contentElement) {
             contentElement.classList.remove('slds-hide');
             contentElement.classList.add('slds-show');
-            
-            // Render the content for the selected tab
-            switch (tabName) {
-                case 'initiatives':
-                    renderInitiativesList();
-                    break;
-                case 'positions':
-                    renderPositionsList();
-                    break;
-                case 'shifts':
-                    renderShiftsList();
-                    break;
-                case 'assignments':
-                    renderAssignmentsList();
-                    break;
-            }
         }
     }
 }
 
 function renderInitiativesList() {
     const container = document.getElementById('initiativesList');
-    if (!container) return;
-    
     const initiatives = [];
+    
     sampleData.initiatives.forEach(initiative => {
         initiatives.push({
             id: initiative.id,
             name: initiative.name,
             currentStatus: initiative.status,
-            plannedStatus: currentViewMode === 'initiative' ? 'Canceled' : initiative.status
+            plannedStatus: currentViewMode === 'initiative' ? 'Cancelled' : initiative.status
         });
     });
     
-    let html = '<div class="slds-p-around_medium">';
-    html += '<table class="slds-table slds-table_cell-buffer slds-table_bordered">';
-    html += '<thead><tr class="slds-line-height_reset">';
-    html += '<th class="slds-text-title_caps" scope="col">Initiative Name</th>';
-    html += '<th class="slds-text-title_caps" scope="col">Current Status</th>';
-    html += '<th class="slds-text-title_caps" scope="col">Planned Status</th>';
-    html += '</tr></thead><tbody>';
-    
-    initiatives.forEach(item => {
-        html += '<tr>';
-        html += `<td><a href="#" class="slds-link">${item.name}</a></td>`;
-        html += `<td>${item.currentStatus}</td>`;
-        html += `<td>${item.plannedStatus}</td>`;
-        html += '</tr>';
-    });
-    
-    html += '</tbody></table></div>';
-    container.innerHTML = html;
+    container.innerHTML = createDataTable('initiative', initiatives, [
+        { key: 'name', label: 'Initiative Name', sortable: true, linked: true },
+        { key: 'currentStatus', label: 'Current Status', sortable: true },
+        { key: 'plannedStatus', label: 'Planned Status', sortable: true }
+    ]);
 }
 
 function renderPositionsList() {
     const container = document.getElementById('positionsList');
-    if (!container) return;
-    
     const positions = [];
+    
     sampleData.initiatives.forEach(initiative => {
         (initiative.positions || []).forEach(position => {
+            // Only show positions that will be affected based on current view mode
             const isAffected = currentViewMode === 'initiative' || 
                               (currentViewMode === 'position' && position.id === 'pos_1');
+            
             positions.push({
                 id: position.id,
                 name: position.name,
                 currentStatus: position.status,
-                plannedStatus: isAffected ? 'Canceled' : position.status,
+                plannedStatus: isAffected ? 'Cancelled' : position.status,
                 isAffected: isAffected
             });
         });
     });
     
-    let html = '<div class="slds-p-around_medium">';
-    html += '<table class="slds-table slds-table_cell-buffer slds-table_bordered">';
-    html += '<thead><tr class="slds-line-height_reset">';
-    html += '<th class="slds-text-title_caps" scope="col">Position Name</th>';
-    html += '<th class="slds-text-title_caps" scope="col">Current Status</th>';
-    html += '<th class="slds-text-title_caps" scope="col">Planned Status</th>';
-    html += '</tr></thead><tbody>';
-    
-    positions.forEach(item => {
-        const rowClass = item.isAffected === false ? 'slds-hint-parent' : '';
-        html += `<tr class="${rowClass}">`;
-        html += `<td><a href="#" class="slds-link">${item.name}</a></td>`;
-        html += `<td>${item.currentStatus}</td>`;
-        html += `<td>${item.plannedStatus}</td>`;
-        html += '</tr>';
-    });
-    
-    html += '</tbody></table></div>';
-    container.innerHTML = html;
+    container.innerHTML = createDataTable('position', positions, [
+        { key: 'name', label: 'Position Name', sortable: true, linked: true },
+        { key: 'currentStatus', label: 'Current Status', sortable: true },
+        { key: 'plannedStatus', label: 'Planned Status', sortable: true }
+    ]);
 }
 
 function renderShiftsList() {
     const container = document.getElementById('shiftsList');
-    if (!container) return;
-    
     const shifts = [];
+    
     sampleData.initiatives.forEach(initiative => {
         (initiative.positions || []).forEach(position => {
             (position.shifts || []).forEach(shift => {
+                // Only show shifts that will be affected based on current view mode
                 const isAffected = currentViewMode === 'initiative' || 
                                   (currentViewMode === 'position' && position.id === 'pos_1');
+                
                 shifts.push({
                     id: shift.id,
                     name: shift.name,
                     currentStatus: shift.status,
-                    plannedStatus: isAffected ? 'Canceled' : shift.status,
+                    plannedStatus: isAffected ? 'Cancelled' : shift.status,
                     isAffected: isAffected
                 });
             });
         });
     });
     
-    let html = '<div class="slds-p-around_medium">';
-    html += '<table class="slds-table slds-table_cell-buffer slds-table_bordered">';
-    html += '<thead><tr class="slds-line-height_reset">';
-    html += '<th class="slds-text-title_caps" scope="col">Shift Name</th>';
-    html += '<th class="slds-text-title_caps" scope="col">Current Status</th>';
-    html += '<th class="slds-text-title_caps" scope="col">Planned Status</th>';
-    html += '</tr></thead><tbody>';
-    
-    shifts.forEach(item => {
-        const rowClass = item.isAffected === false ? 'slds-hint-parent' : '';
-        html += `<tr class="${rowClass}">`;
-        html += `<td><a href="#" class="slds-link">${item.name}</a></td>`;
-        html += `<td>${item.currentStatus}</td>`;
-        html += `<td>${item.plannedStatus}</td>`;
-        html += '</tr>';
-    });
-    
-    html += '</tbody></table></div>';
-    container.innerHTML = html;
+    container.innerHTML = createDataTable('shift', shifts, [
+        { key: 'name', label: 'Shift Name', sortable: true, linked: true },
+        { key: 'currentStatus', label: 'Current Status', sortable: true },
+        { key: 'plannedStatus', label: 'Planned Status', sortable: true }
+    ]);
 }
 
 function renderAssignmentsList() {
     const container = document.getElementById('assignmentsList');
-    if (!container) return;
-    
     const assignments = [];
+    
     sampleData.initiatives.forEach(initiative => {
         (initiative.positions || []).forEach(position => {
             (position.shifts || []).forEach(shift => {
                 (shift.assignments || []).forEach(assignment => {
+                    // Only show assignments that will be affected based on current view mode
                     const isAffected = currentViewMode === 'initiative' || 
                                       (currentViewMode === 'position' && position.id === 'pos_1');
+                    
                     assignments.push({
                         id: assignment.id,
                         name: `${shift.name} - ${assignment.volunteerName}`,
                         currentStatus: assignment.status,
-                        plannedStatus: isAffected ? 'Canceled' : assignment.status,
+                        plannedStatus: isAffected ? 'Cancelled' : assignment.status,
                         personAccount: assignment.volunteerName,
                         isAffected: isAffected
                     });
@@ -784,27 +725,12 @@ function renderAssignmentsList() {
         });
     });
     
-    let html = '<div class="slds-p-around_medium">';
-    html += '<table class="slds-table slds-table_cell-buffer slds-table_bordered">';
-    html += '<thead><tr class="slds-line-height_reset">';
-    html += '<th class="slds-text-title_caps" scope="col">Assignment</th>';
-    html += '<th class="slds-text-title_caps" scope="col">Current Status</th>';
-    html += '<th class="slds-text-title_caps" scope="col">Planned Status</th>';
-    html += '<th class="slds-text-title_caps" scope="col">Person Account</th>';
-    html += '</tr></thead><tbody>';
-    
-    assignments.forEach(item => {
-        const rowClass = item.isAffected === false ? 'slds-hint-parent' : '';
-        html += `<tr class="${rowClass}">`;
-        html += `<td><a href="#" class="slds-link">${item.name}</a></td>`;
-        html += `<td>${item.currentStatus}</td>`;
-        html += `<td>${item.plannedStatus}</td>`;
-        html += `<td><a href="#" class="slds-link">${item.personAccount}</a></td>`;
-        html += '</tr>';
-    });
-    
-    html += '</tbody></table></div>';
-    container.innerHTML = html;
+    container.innerHTML = createDataTable('assignment', assignments, [
+        { key: 'name', label: 'Assignment', sortable: true, linked: true },
+        { key: 'currentStatus', label: 'Current Status', sortable: true },
+        { key: 'plannedStatus', label: 'Planned Status', sortable: true },
+        { key: 'personAccount', label: 'Person Account', sortable: true, linked: true }
+    ]);
 }
 
 // Data Table Creation Functions
@@ -815,16 +741,23 @@ function createDataTable(type, data, columns) {
     
     const tableId = `${type}-table`;
     let html = `
-        <div style="padding: 1rem;">
-            <h4 style="margin-bottom: 1rem;">Found ${data.length} ${type}(s)</h4>
-            <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
-                <thead style="background-color: #f5f5f5;">
-                    <tr>
+        <div class="slds-table_cell-buffer">
+            <table class="slds-table slds-table_cell-buffer slds-table_striped slds-table_col-bordered data-table" id="${tableId}">
+                <thead>
+                    <tr class="slds-line-height_reset">
     `;
     
-    // Generate simple table headers
+    // Generate table headers
     columns.forEach(column => {
-        html += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">${column.label}</th>`;
+        const sortClass = column.sortable ? 'sortable-header' : '';
+        const sortIcon = column.sortable ? '<i class="fas fa-sort slds-m-left_x-small sort-icon"></i>' : '';
+        html += `
+            <th class="${sortClass}" data-column="${column.key}" data-type="${type}" scope="col">
+                <div class="slds-truncate" title="${column.label}">
+                    ${column.label}${sortIcon}
+                </div>
+            </th>
+        `;
     });
     
     html += `
@@ -833,19 +766,31 @@ function createDataTable(type, data, columns) {
                 <tbody>
     `;
     
-    // Generate simple table rows
+    // Generate table rows
     data.forEach((item, index) => {
-        html += `<tr style="background-color: ${index % 2 === 0 ? '#fff' : '#f9f9f9'};">`;
+        const rowClass = item.isAffected === false ? 'grayed-out-row' : '';
+        html += `<tr class="${rowClass}">`;
         
         columns.forEach(column => {
             let cellValue = item[column.key] || '';
+            let cellClass = '';
+            
+            // Handle status columns with proper styling
+            if (column.key === 'currentStatus' || column.key === 'plannedStatus') {
+                cellClass = `status-cell ${getStatusClass(cellValue)}`;
+                cellValue = `<span class="status-badge ${getStatusClass(cellValue)}">${cellValue}</span>`;
+            }
             
             // Handle linked columns
             if (column.linked && cellValue) {
-                cellValue = `<a href="#" style="color: #0176d3; text-decoration: none;">${cellValue}</a>`;
+                cellValue = `<a href="#" class="slds-link record-link" data-id="${item.id}" data-type="${type}">${cellValue}</a>`;
             }
             
-            html += `<td style="border: 1px solid #ddd; padding: 8px;">${cellValue}</td>`;
+            html += `
+                <td class="${cellClass}" data-label="${column.label}">
+                    <div class="slds-truncate" title="${item[column.key] || ''}">${cellValue}</div>
+                </td>
+            `;
         });
         
         html += '</tr>';
@@ -856,6 +801,11 @@ function createDataTable(type, data, columns) {
             </table>
         </div>
     `;
+    
+    // Add event listeners for sorting after table is rendered
+    setTimeout(() => {
+        addTableEventListeners(tableId, type, data, columns);
+    }, 0);
     
     return html;
 }
@@ -880,6 +830,7 @@ function addTableEventListeners(tableId, type, data, columns) {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             // Handle record link clicks - could open details modal, etc.
+            console.log(`Clicked ${link.dataset.type} record:`, link.dataset.id);
         });
     });
 }
@@ -937,10 +888,10 @@ function sortTable(tableId, column, type, data, columns) {
             let cellValue = item[column.key] || '';
             let cellClass = '';
             
-            // Handle status columns - keep as plain text
+            // Handle status columns with proper styling
             if (column.key === 'currentStatus' || column.key === 'plannedStatus') {
-                cellClass = `status-cell`;
-                // Keep as plain text, no badges
+                cellClass = `status-cell ${getStatusClass(cellValue)}`;
+                cellValue = `<span class="status-badge ${getStatusClass(cellValue)}">${cellValue}</span>`;
             }
             
             // Handle linked columns
@@ -965,6 +916,7 @@ function sortTable(tableId, column, type, data, columns) {
     recordLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
+            console.log(`Clicked ${link.dataset.type} record:`, link.dataset.id);
         });
     });
 }
@@ -1015,11 +967,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Initialize with correct totals for the demo
+    console.log(`VM Agent ready - ${totalImpact} total records in sample data`);
 });
 
-// Status classes for basic styling (plain text only)
+// Add CSS for status classes
 const statusStyles = document.createElement('style');
 statusStyles.textContent = `
-    .status-cell { font-weight: 500; color: #3e3e3c; }
+    .status-active { background: #e8f5e8; color: #2e844a; }
+    .status-confirmed { background: #e8f4fd; color: #0176d3; }
+    .status-pending { background: #fef7e8; color: #fe9339; }
+    .status-waitlist { background: #f3e8ff; color: #8b5cf6; }
+    .status-cancelled { background: #ffebee; color: #c62d42; }
+    .status-default { background: #f4f6f9; color: #706e6b; }
 `;
 document.head.appendChild(statusStyles); 

@@ -718,10 +718,42 @@ body {
     color: #0176d3;
 }
 
-/* Status cells - plain text styling */
-.status-cell {
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
     font-weight: 500;
-    color: #3e3e3c;
+    text-align: center;
+    min-width: 70px;
+    text-transform: none;
+}
+
+/* Status classes */
+.status-active .status-badge {
+    background-color: #45c65a;
+    color: white;
+}
+
+.status-pending .status-badge {
+    background-color: #ffb75d;
+    color: #080707;
+}
+
+.status-cancelled .status-badge {
+    background-color: #ea001e;
+    color: white;
+}
+
+.status-confirmed .status-badge {
+    background-color: #45c65a;
+    color: white;
+}
+
+.status-waitlist .status-badge {
+    background-color: #ffb75d;
+    color: #080707;
 }
 
 /* Grayed-out rows (not affected by cancellation) */
@@ -734,7 +766,9 @@ body {
     color: #706e6b !important;
 }
 
-
+.grayed-out-row .status-badge {
+    opacity: 0.7;
+}
 
 .grayed-out-row .record-link {
     color: #706e6b !important;
@@ -905,21 +939,4 @@ body {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
-} 
-
-/* Force tab content visibility - override SLDS hiding */
-.slds-tabs_default__content {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    height: auto !important;
-    overflow: visible !important;
-}
-
-.slds-tabs_default__content.slds-hide {
-    display: none !important;
-}
-
-.slds-tabs_default__content.slds-show {
-    display: block !important;
 } 

@@ -604,6 +604,9 @@ function renderListView() {
 }
 
 function switchTab(tabName) {
+    // Simple test to verify function is called
+    console.log('switchTab called with:', tabName);
+    
     currentTab = tabName;
     
     // Update SLDS tab states
@@ -620,6 +623,9 @@ function switchTab(tabName) {
     if (tabIndex !== -1) {
         document.querySelectorAll('.slds-tabs_default__item')[tabIndex].classList.add('slds-is-active');
         const contentElement = document.getElementById(`${tabName}List`);
+        console.log('Looking for container:', `${tabName}List`);
+        console.log('Found container:', contentElement);
+        
         if (contentElement) {
             contentElement.classList.remove('slds-hide');
             contentElement.classList.add('slds-show');
@@ -627,6 +633,7 @@ function switchTab(tabName) {
             // Render the content for the selected tab
             switch (tabName) {
                 case 'initiatives':
+                    console.log('About to call renderInitiativesList');
                     renderInitiativesList();
                     break;
                 case 'positions':
@@ -639,28 +646,21 @@ function switchTab(tabName) {
                     renderAssignmentsList();
                     break;
             }
+        } else {
+            console.error('Container not found:', `${tabName}List`);
         }
     }
 }
 
 function renderInitiativesList() {
     const container = document.getElementById('initiativesList');
-    const initiatives = [];
+    if (!container) {
+        alert('Container "initiativesList" not found!');
+        return;
+    }
     
-    sampleData.initiatives.forEach(initiative => {
-        initiatives.push({
-            id: initiative.id,
-            name: initiative.name,
-            currentStatus: initiative.status,
-            plannedStatus: currentViewMode === 'initiative' ? 'Canceled' : initiative.status
-        });
-    });
-    
-    container.innerHTML = createDataTable('initiative', initiatives, [
-        { key: 'name', label: 'Initiative Name', sortable: true, linked: true },
-        { key: 'currentStatus', label: 'Current Status', sortable: true },
-        { key: 'plannedStatus', label: 'Planned Status', sortable: true }
-    ]);
+    // Simple test - just put some text
+    container.innerHTML = '<div style="padding: 20px; background: yellow; border: 2px solid red;"><h3>TEST: renderInitiativesList was called!</h3><p>Container found successfully!</p><p>Sample data has ' + sampleData.initiatives.length + ' initiatives</p></div>';
 }
 
 function renderPositionsList() {

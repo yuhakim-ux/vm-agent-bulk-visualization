@@ -625,128 +625,299 @@ function switchTab(tabName) {
 
 function renderInitiativesList() {
     const container = document.getElementById('initiativesList');
-    container.innerHTML = '<div class="record-list"></div>';
-    const listContainer = container.querySelector('.record-list');
+    const initiatives = [];
     
     sampleData.initiatives.forEach(initiative => {
-        const card = createRecordCard(initiative, 'initiative');
-        listContainer.appendChild(card);
+        initiatives.push({
+            id: initiative.id,
+            name: initiative.name,
+            currentStatus: initiative.status,
+            plannedStatus: currentViewMode === 'initiative' ? 'Cancelled' : initiative.status
+        });
     });
+    
+    container.innerHTML = createDataTable('initiative', initiatives, [
+        { key: 'name', label: 'Initiative Name', sortable: true, linked: true },
+        { key: 'currentStatus', label: 'Current Status', sortable: true },
+        { key: 'plannedStatus', label: 'Planned Status', sortable: true }
+    ]);
 }
 
 function renderPositionsList() {
     const container = document.getElementById('positionsList');
-    container.innerHTML = '<div class="record-list"></div>';
-    const listContainer = container.querySelector('.record-list');
+    const positions = [];
     
     sampleData.initiatives.forEach(initiative => {
         (initiative.positions || []).forEach(position => {
-            const card = createRecordCard({...position, initiativeName: initiative.name}, 'position');
-            listContainer.appendChild(card);
+            // Only show positions that will be affected based on current view mode
+            const isAffected = currentViewMode === 'initiative' || 
+                              (currentViewMode === 'position' && position.id === 'pos_1');
+            
+            positions.push({
+                id: position.id,
+                name: position.name,
+                currentStatus: position.status,
+                plannedStatus: isAffected ? 'Cancelled' : position.status,
+                isAffected: isAffected
+            });
         });
     });
+    
+    container.innerHTML = createDataTable('position', positions, [
+        { key: 'name', label: 'Position Name', sortable: true, linked: true },
+        { key: 'currentStatus', label: 'Current Status', sortable: true },
+        { key: 'plannedStatus', label: 'Planned Status', sortable: true }
+    ]);
 }
 
 function renderShiftsList() {
     const container = document.getElementById('shiftsList');
-    container.innerHTML = '<div class="record-list"></div>';
-    const listContainer = container.querySelector('.record-list');
+    const shifts = [];
     
     sampleData.initiatives.forEach(initiative => {
         (initiative.positions || []).forEach(position => {
             (position.shifts || []).forEach(shift => {
-                const card = createRecordCard({
-                    ...shift, 
-                    initiativeName: initiative.name,
-                    positionName: position.name
-                }, 'shift');
-                listContainer.appendChild(card);
+                // Only show shifts that will be affected based on current view mode
+                const isAffected = currentViewMode === 'initiative' || 
+                                  (currentViewMode === 'position' && position.id === 'pos_1');
+                
+                shifts.push({
+                    id: shift.id,
+                    name: shift.name,
+                    currentStatus: shift.status,
+                    plannedStatus: isAffected ? 'Cancelled' : shift.status,
+                    isAffected: isAffected
+                });
             });
         });
     });
+    
+    container.innerHTML = createDataTable('shift', shifts, [
+        { key: 'name', label: 'Shift Name', sortable: true, linked: true },
+        { key: 'currentStatus', label: 'Current Status', sortable: true },
+        { key: 'plannedStatus', label: 'Planned Status', sortable: true }
+    ]);
 }
 
 function renderAssignmentsList() {
     const container = document.getElementById('assignmentsList');
-    container.innerHTML = '<div class="record-list"></div>';
-    const listContainer = container.querySelector('.record-list');
+    const assignments = [];
     
     sampleData.initiatives.forEach(initiative => {
         (initiative.positions || []).forEach(position => {
             (position.shifts || []).forEach(shift => {
                 (shift.assignments || []).forEach(assignment => {
-                    const card = createRecordCard({
-                        ...assignment,
-                        initiativeName: initiative.name,
-                        positionName: position.name,
-                        shiftName: shift.name,
-                        shiftTime: shift.startTime
-                    }, 'assignment');
-                    listContainer.appendChild(card);
+                    // Only show assignments that will be affected based on current view mode
+                    const isAffected = currentViewMode === 'initiative' || 
+                                      (currentViewMode === 'position' && position.id === 'pos_1');
+                    
+                    assignments.push({
+                        id: assignment.id,
+                        name: `${shift.name} - ${assignment.volunteerName}`,
+                        currentStatus: assignment.status,
+                        plannedStatus: isAffected ? 'Cancelled' : assignment.status,
+                        personAccount: assignment.volunteerName,
+                        isAffected: isAffected
+                    });
                 });
             });
         });
     });
+    
+    container.innerHTML = createDataTable('assignment', assignments, [
+        { key: 'name', label: 'Assignment', sortable: true, linked: true },
+        { key: 'currentStatus', label: 'Current Status', sortable: true },
+        { key: 'plannedStatus', label: 'Planned Status', sortable: true },
+        { key: 'personAccount', label: 'Person Account', sortable: true, linked: true }
+    ]);
 }
 
-function createRecordCard(item, type) {
-    const card = document.createElement('div');
-    card.className = 'record-item';
+// Data Table Creation Functions
+function createDataTable(type, data, columns) {
+    if (data.length === 0) {
+        return '<div class="slds-text-align_center slds-p-around_medium slds-text-color_weak">No records to display</div>';
+    }
     
-    const icon = getNodeIcon(type);
-    const content = getCardContent(item, type);
-    
-    card.innerHTML = `
-        <div class="record-header">
-            ${icon}
-            <span class="record-title">${item.name || item.volunteerName}</span>
-        </div>
-        ${content}
-        <div class="record-status ${getStatusClass(item.status)}">${item.status}</div>
+    const tableId = `${type}-table`;
+    let html = `
+        <div class="slds-table_cell-buffer">
+            <table class="slds-table slds-table_cell-buffer slds-table_striped slds-table_col-bordered data-table" id="${tableId}">
+                <thead>
+                    <tr class="slds-line-height_reset">
     `;
     
-    return card;
+    // Generate table headers
+    columns.forEach(column => {
+        const sortClass = column.sortable ? 'sortable-header' : '';
+        const sortIcon = column.sortable ? '<i class="fas fa-sort slds-m-left_x-small sort-icon"></i>' : '';
+        html += `
+            <th class="${sortClass}" data-column="${column.key}" data-type="${type}" scope="col">
+                <div class="slds-truncate" title="${column.label}">
+                    ${column.label}${sortIcon}
+                </div>
+            </th>
+        `;
+    });
+    
+    html += `
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    // Generate table rows
+    data.forEach((item, index) => {
+        const rowClass = item.isAffected === false ? 'grayed-out-row' : '';
+        html += `<tr class="${rowClass}">`;
+        
+        columns.forEach(column => {
+            let cellValue = item[column.key] || '';
+            let cellClass = '';
+            
+            // Handle status columns with proper styling
+            if (column.key === 'currentStatus' || column.key === 'plannedStatus') {
+                cellClass = `status-cell ${getStatusClass(cellValue)}`;
+                cellValue = `<span class="status-badge ${getStatusClass(cellValue)}">${cellValue}</span>`;
+            }
+            
+            // Handle linked columns
+            if (column.linked && cellValue) {
+                cellValue = `<a href="#" class="slds-link record-link" data-id="${item.id}" data-type="${type}">${cellValue}</a>`;
+            }
+            
+            html += `
+                <td class="${cellClass}" data-label="${column.label}">
+                    <div class="slds-truncate" title="${item[column.key] || ''}">${cellValue}</div>
+                </td>
+            `;
+        });
+        
+        html += '</tr>';
+    });
+    
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    // Add event listeners for sorting after table is rendered
+    setTimeout(() => {
+        addTableEventListeners(tableId, type, data, columns);
+    }, 0);
+    
+    return html;
 }
 
-function getCardContent(item, type) {
-    switch (type) {
-        case 'initiative':
-            return `
-                <div class="record-meta">
-                    ${formatDate(item.startDate)} - ${formatDate(item.endDate)}<br>
-                    ${item.description}
-                </div>
-            `;
-        case 'position':
-            return `
-                <div class="record-meta">
-                    Initiative: ${item.initiativeName}<br>
-                    Hours/Week: ${item.hoursPerWeek}<br>
-                    Skills: ${item.skillsRequired}
-                </div>
-            `;
-        case 'shift':
-            return `
-                <div class="record-meta">
-                    Initiative: ${item.initiativeName}<br>
-                    Position: ${item.positionName}<br>
-                    Time: ${formatDateTime(item.startTime)}<br>
-                    Location: ${item.location}
-                </div>
-            `;
-        case 'assignment':
-            return `
-                <div class="record-meta">
-                    Initiative: ${item.initiativeName}<br>
-                    Position: ${item.positionName}<br>
-                    Shift: ${item.shiftName}<br>
-                    Time: ${formatDateTime(item.shiftTime)}<br>
-                    Email: ${item.email}
-                </div>
-            `;
-        default:
-            return '';
+// Add event listeners for table interactions
+function addTableEventListeners(tableId, type, data, columns) {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    
+    // Add sort event listeners
+    const sortableHeaders = table.querySelectorAll('.sortable-header');
+    sortableHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            sortTable(tableId, header.dataset.column, type, data, columns);
+        });
+        header.style.cursor = 'pointer';
+    });
+    
+    // Add link click handlers
+    const recordLinks = table.querySelectorAll('.record-link');
+    recordLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Handle record link clicks - could open details modal, etc.
+            console.log(`Clicked ${link.dataset.type} record:`, link.dataset.id);
+        });
+    });
+}
+
+// Table sorting functionality
+function sortTable(tableId, column, type, data, columns) {
+    const table = document.getElementById(tableId);
+    const header = table.querySelector(`[data-column="${column}"]`);
+    const sortIcon = header.querySelector('.sort-icon');
+    
+    // Determine sort direction
+    let sortDirection = 'asc';
+    if (header.classList.contains('sort-asc')) {
+        sortDirection = 'desc';
+    } else if (header.classList.contains('sort-desc')) {
+        sortDirection = 'asc';
     }
+    
+    // Clear all sort classes and icons
+    table.querySelectorAll('.sortable-header').forEach(h => {
+        h.classList.remove('sort-asc', 'sort-desc');
+        const icon = h.querySelector('.sort-icon');
+        icon.className = 'fas fa-sort slds-m-left_x-small sort-icon';
+    });
+    
+    // Apply sort class and icon
+    header.classList.add(`sort-${sortDirection}`);
+    sortIcon.className = `fas fa-sort-${sortDirection === 'asc' ? 'up' : 'down'} slds-m-left_x-small sort-icon`;
+    
+    // Sort the data
+    const sortedData = [...data].sort((a, b) => {
+        let aVal = a[column] || '';
+        let bVal = b[column] || '';
+        
+        // Convert to strings for comparison
+        aVal = aVal.toString().toLowerCase();
+        bVal = bVal.toString().toLowerCase();
+        
+        if (sortDirection === 'asc') {
+            return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+        } else {
+            return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+        }
+    });
+    
+    // Re-render table body with sorted data
+    const tbody = table.querySelector('tbody');
+    tbody.innerHTML = '';
+    
+    sortedData.forEach((item) => {
+        const rowClass = item.isAffected === false ? 'grayed-out-row' : '';
+        let rowHtml = `<tr class="${rowClass}">`;
+        
+        columns.forEach(column => {
+            let cellValue = item[column.key] || '';
+            let cellClass = '';
+            
+            // Handle status columns with proper styling
+            if (column.key === 'currentStatus' || column.key === 'plannedStatus') {
+                cellClass = `status-cell ${getStatusClass(cellValue)}`;
+                cellValue = `<span class="status-badge ${getStatusClass(cellValue)}">${cellValue}</span>`;
+            }
+            
+            // Handle linked columns
+            if (column.linked && cellValue) {
+                const originalValue = item[column.key];
+                cellValue = `<a href="#" class="slds-link record-link" data-id="${item.id}" data-type="${type}">${originalValue}</a>`;
+            }
+            
+            rowHtml += `
+                <td class="${cellClass}" data-label="${column.label}">
+                    <div class="slds-truncate" title="${item[column.key] || ''}">${cellValue}</div>
+                </td>
+            `;
+        });
+        
+        rowHtml += '</tr>';
+        tbody.innerHTML += rowHtml;
+    });
+    
+    // Re-add event listeners for links
+    const recordLinks = table.querySelectorAll('.record-link');
+    recordLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log(`Clicked ${link.dataset.type} record:`, link.dataset.id);
+        });
+    });
 }
 
 // Initialize the application

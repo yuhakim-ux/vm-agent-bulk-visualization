@@ -666,6 +666,148 @@ body {
     color: #706e6b;
 }
 
+/* Data Tables */
+.data-table {
+    width: 100%;
+    font-size: 0.875rem;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    background-color: #f3f2f2;
+    border-bottom: 2px solid #dddbda;
+    padding: 0.75rem 0.5rem;
+    text-align: left;
+    font-weight: 600;
+    color: #3e3e3c;
+    white-space: nowrap;
+    position: relative;
+}
+
+.data-table td {
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid #dddbda;
+    vertical-align: middle;
+}
+
+/* Sortable column headers */
+.sortable-header {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+    position: relative;
+}
+
+.sortable-header:hover {
+    background-color: #e5e5e5;
+}
+
+.sortable-header.sort-asc,
+.sortable-header.sort-desc {
+    background-color: #e8f4fd;
+    color: #0176d3;
+}
+
+.sort-icon {
+    color: #706e6b;
+    font-size: 0.75rem;
+}
+
+.sortable-header.sort-asc .sort-icon,
+.sortable-header.sort-desc .sort-icon {
+    color: #0176d3;
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-align: center;
+    min-width: 70px;
+    text-transform: none;
+}
+
+/* Status classes */
+.status-active .status-badge {
+    background-color: #45c65a;
+    color: white;
+}
+
+.status-pending .status-badge {
+    background-color: #ffb75d;
+    color: #080707;
+}
+
+.status-cancelled .status-badge {
+    background-color: #ea001e;
+    color: white;
+}
+
+.status-confirmed .status-badge {
+    background-color: #45c65a;
+    color: white;
+}
+
+.status-waitlist .status-badge {
+    background-color: #ffb75d;
+    color: #080707;
+}
+
+/* Grayed-out rows (not affected by cancellation) */
+.grayed-out-row {
+    opacity: 0.5;
+    background-color: #fafaf9 !important;
+}
+
+.grayed-out-row td {
+    color: #706e6b !important;
+}
+
+.grayed-out-row .status-badge {
+    opacity: 0.7;
+}
+
+.grayed-out-row .record-link {
+    color: #706e6b !important;
+}
+
+/* Record links */
+.record-link {
+    font-weight: 500;
+    text-decoration: none;
+    color: #0176d3;
+}
+
+.record-link:hover {
+    text-decoration: underline;
+    color: #014486;
+}
+
+/* Table responsive behavior */
+@media (max-width: 768px) {
+    .data-table {
+        font-size: 0.75rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .data-table th {
+        font-size: 0.6875rem;
+    }
+}
+
+/* Empty state */
+.slds-text-color_weak {
+    color: #706e6b !important;
+    font-style: italic;
+}
+
 /* Modal Footer */
 .modal-footer {
     padding: 20px 24px;

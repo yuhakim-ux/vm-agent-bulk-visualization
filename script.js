@@ -685,7 +685,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update header dynamically
     const headerElement = document.querySelector('.viz-header h3');
     if (headerElement) {
-        headerElement.textContent = `Bulk Update: ${totalImpact} records will be updated`;
+        headerElement.textContent = `${totalImpact} records will be updated`;
     }
     
     // Close modal when clicking outside

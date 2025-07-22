@@ -649,7 +649,6 @@ function renderInitiativesList() {
     if (!container) return;
     
     const initiatives = [];
-    
     sampleData.initiatives.forEach(initiative => {
         initiatives.push({
             id: initiative.id,
@@ -659,39 +658,23 @@ function renderInitiativesList() {
         });
     });
     
-    // Create simple data table that works within SLDS constraints
-    let html = `
-        <div style="padding: 1rem; overflow: auto;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                <thead>
-                    <tr style="background: #f3f2f2; border-bottom: 2px solid #dddbda;">
-                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Initiative Name</th>
-                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Current Status</th>
-                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Planned Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-    `;
+    let html = '<div class="slds-p-around_medium">';
+    html += '<table class="slds-table slds-table_cell-buffer slds-table_bordered">';
+    html += '<thead><tr class="slds-line-height_reset">';
+    html += '<th class="slds-text-title_caps" scope="col">Initiative Name</th>';
+    html += '<th class="slds-text-title_caps" scope="col">Current Status</th>';
+    html += '<th class="slds-text-title_caps" scope="col">Planned Status</th>';
+    html += '</tr></thead><tbody>';
     
-    initiatives.forEach((item, index) => {
-        const bgColor = index % 2 === 0 ? '#fff' : '#fafafa';
-        html += `
-            <tr style="background: ${bgColor}; border-bottom: 1px solid #e5e5e5;">
-                <td style="padding: 12px 8px;">
-                    <a href="#" style="color: #0176d3; text-decoration: none; font-weight: 500;">${item.name}</a>
-                </td>
-                <td style="padding: 12px 8px; font-weight: 500;">${item.currentStatus}</td>
-                <td style="padding: 12px 8px; font-weight: 500;">${item.plannedStatus}</td>
-            </tr>
-        `;
+    initiatives.forEach(item => {
+        html += '<tr>';
+        html += `<td><a href="#" class="slds-link">${item.name}</a></td>`;
+        html += `<td>${item.currentStatus}</td>`;
+        html += `<td>${item.plannedStatus}</td>`;
+        html += '</tr>';
     });
     
-    html += `
-                </tbody>
-            </table>
-        </div>
-    `;
-    
+    html += '</tbody></table></div>';
     container.innerHTML = html;
 }
 
@@ -700,12 +683,10 @@ function renderPositionsList() {
     if (!container) return;
     
     const positions = [];
-    
     sampleData.initiatives.forEach(initiative => {
         (initiative.positions || []).forEach(position => {
             const isAffected = currentViewMode === 'initiative' || 
                               (currentViewMode === 'position' && position.id === 'pos_1');
-            
             positions.push({
                 id: position.id,
                 name: position.name,
@@ -716,39 +697,24 @@ function renderPositionsList() {
         });
     });
     
-    let html = `
-        <div style="padding: 1rem; overflow: auto;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                <thead>
-                    <tr style="background: #f3f2f2; border-bottom: 2px solid #dddbda;">
-                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Position Name</th>
-                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Current Status</th>
-                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Planned Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-    `;
+    let html = '<div class="slds-p-around_medium">';
+    html += '<table class="slds-table slds-table_cell-buffer slds-table_bordered">';
+    html += '<thead><tr class="slds-line-height_reset">';
+    html += '<th class="slds-text-title_caps" scope="col">Position Name</th>';
+    html += '<th class="slds-text-title_caps" scope="col">Current Status</th>';
+    html += '<th class="slds-text-title_caps" scope="col">Planned Status</th>';
+    html += '</tr></thead><tbody>';
     
-    positions.forEach((item, index) => {
-        const bgColor = index % 2 === 0 ? '#fff' : '#fafafa';
-        const rowStyle = item.isAffected === false ? 'opacity: 0.5;' : '';
-        html += `
-            <tr style="background: ${bgColor}; border-bottom: 1px solid #e5e5e5; ${rowStyle}">
-                <td style="padding: 12px 8px;">
-                    <a href="#" style="color: #0176d3; text-decoration: none; font-weight: 500;">${item.name}</a>
-                </td>
-                <td style="padding: 12px 8px; font-weight: 500;">${item.currentStatus}</td>
-                <td style="padding: 12px 8px; font-weight: 500;">${item.plannedStatus}</td>
-            </tr>
-        `;
+    positions.forEach(item => {
+        const rowClass = item.isAffected === false ? 'slds-hint-parent' : '';
+        html += `<tr class="${rowClass}">`;
+        html += `<td><a href="#" class="slds-link">${item.name}</a></td>`;
+        html += `<td>${item.currentStatus}</td>`;
+        html += `<td>${item.plannedStatus}</td>`;
+        html += '</tr>';
     });
     
-    html += `
-                </tbody>
-            </table>
-        </div>
-    `;
-    
+    html += '</tbody></table></div>';
     container.innerHTML = html;
 }
 
@@ -757,13 +723,11 @@ function renderShiftsList() {
     if (!container) return;
     
     const shifts = [];
-    
     sampleData.initiatives.forEach(initiative => {
         (initiative.positions || []).forEach(position => {
             (position.shifts || []).forEach(shift => {
                 const isAffected = currentViewMode === 'initiative' || 
                                   (currentViewMode === 'position' && position.id === 'pos_1');
-                
                 shifts.push({
                     id: shift.id,
                     name: shift.name,
@@ -775,39 +739,24 @@ function renderShiftsList() {
         });
     });
     
-    let html = `
-        <div style="padding: 1rem; overflow: auto;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                <thead>
-                    <tr style="background: #f3f2f2; border-bottom: 2px solid #dddbda;">
-                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Shift Name</th>
-                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Current Status</th>
-                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Planned Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-    `;
+    let html = '<div class="slds-p-around_medium">';
+    html += '<table class="slds-table slds-table_cell-buffer slds-table_bordered">';
+    html += '<thead><tr class="slds-line-height_reset">';
+    html += '<th class="slds-text-title_caps" scope="col">Shift Name</th>';
+    html += '<th class="slds-text-title_caps" scope="col">Current Status</th>';
+    html += '<th class="slds-text-title_caps" scope="col">Planned Status</th>';
+    html += '</tr></thead><tbody>';
     
-    shifts.forEach((item, index) => {
-        const bgColor = index % 2 === 0 ? '#fff' : '#fafafa';
-        const rowStyle = item.isAffected === false ? 'opacity: 0.5;' : '';
-        html += `
-            <tr style="background: ${bgColor}; border-bottom: 1px solid #e5e5e5; ${rowStyle}">
-                <td style="padding: 12px 8px;">
-                    <a href="#" style="color: #0176d3; text-decoration: none; font-weight: 500;">${item.name}</a>
-                </td>
-                <td style="padding: 12px 8px; font-weight: 500;">${item.currentStatus}</td>
-                <td style="padding: 12px 8px; font-weight: 500;">${item.plannedStatus}</td>
-            </tr>
-        `;
+    shifts.forEach(item => {
+        const rowClass = item.isAffected === false ? 'slds-hint-parent' : '';
+        html += `<tr class="${rowClass}">`;
+        html += `<td><a href="#" class="slds-link">${item.name}</a></td>`;
+        html += `<td>${item.currentStatus}</td>`;
+        html += `<td>${item.plannedStatus}</td>`;
+        html += '</tr>';
     });
     
-    html += `
-                </tbody>
-            </table>
-        </div>
-    `;
-    
+    html += '</tbody></table></div>';
     container.innerHTML = html;
 }
 
@@ -816,14 +765,12 @@ function renderAssignmentsList() {
     if (!container) return;
     
     const assignments = [];
-    
     sampleData.initiatives.forEach(initiative => {
         (initiative.positions || []).forEach(position => {
             (position.shifts || []).forEach(shift => {
                 (shift.assignments || []).forEach(assignment => {
                     const isAffected = currentViewMode === 'initiative' || 
                                       (currentViewMode === 'position' && position.id === 'pos_1');
-                    
                     assignments.push({
                         id: assignment.id,
                         name: `${shift.name} - ${assignment.volunteerName}`,
@@ -837,43 +784,26 @@ function renderAssignmentsList() {
         });
     });
     
-    let html = `
-        <div style="padding: 1rem; overflow: auto;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                <thead>
-                    <tr style="background: #f3f2f2; border-bottom: 2px solid #dddbda;">
-                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Assignment</th>
-                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Current Status</th>
-                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Planned Status</th>
-                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: #3e3e3c;">Person Account</th>
-                    </tr>
-                </thead>
-                <tbody>
-    `;
+    let html = '<div class="slds-p-around_medium">';
+    html += '<table class="slds-table slds-table_cell-buffer slds-table_bordered">';
+    html += '<thead><tr class="slds-line-height_reset">';
+    html += '<th class="slds-text-title_caps" scope="col">Assignment</th>';
+    html += '<th class="slds-text-title_caps" scope="col">Current Status</th>';
+    html += '<th class="slds-text-title_caps" scope="col">Planned Status</th>';
+    html += '<th class="slds-text-title_caps" scope="col">Person Account</th>';
+    html += '</tr></thead><tbody>';
     
-    assignments.forEach((item, index) => {
-        const bgColor = index % 2 === 0 ? '#fff' : '#fafafa';
-        const rowStyle = item.isAffected === false ? 'opacity: 0.5;' : '';
-        html += `
-            <tr style="background: ${bgColor}; border-bottom: 1px solid #e5e5e5; ${rowStyle}">
-                <td style="padding: 12px 8px;">
-                    <a href="#" style="color: #0176d3; text-decoration: none; font-weight: 500;">${item.name}</a>
-                </td>
-                <td style="padding: 12px 8px; font-weight: 500;">${item.currentStatus}</td>
-                <td style="padding: 12px 8px; font-weight: 500;">${item.plannedStatus}</td>
-                <td style="padding: 12px 8px;">
-                    <a href="#" style="color: #0176d3; text-decoration: none; font-weight: 500;">${item.personAccount}</a>
-                </td>
-            </tr>
-        `;
+    assignments.forEach(item => {
+        const rowClass = item.isAffected === false ? 'slds-hint-parent' : '';
+        html += `<tr class="${rowClass}">`;
+        html += `<td><a href="#" class="slds-link">${item.name}</a></td>`;
+        html += `<td>${item.currentStatus}</td>`;
+        html += `<td>${item.plannedStatus}</td>`;
+        html += `<td><a href="#" class="slds-link">${item.personAccount}</a></td>`;
+        html += '</tr>';
     });
     
-    html += `
-                </tbody>
-            </table>
-        </div>
-    `;
-    
+    html += '</tbody></table></div>';
     container.innerHTML = html;
 }
 

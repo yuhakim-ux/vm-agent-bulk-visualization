@@ -906,3 +906,20 @@ body {
     white-space: nowrap;
     border: 0;
 } 
+
+/* Force tab content visibility - override SLDS hiding */
+.slds-tabs_default__content {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+    overflow: visible !important;
+}
+
+.slds-tabs_default__content.slds-hide {
+    display: none !important;
+}
+
+.slds-tabs_default__content.slds-show {
+    display: block !important;
+} 

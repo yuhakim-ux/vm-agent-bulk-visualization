@@ -249,7 +249,7 @@ function sendMessage() {
             message.toLowerCase().includes('not the initiative')) {
             
             setTimeout(() => {
-                addMessage('agent', 'Got it! Canceling Food Drive Coordinator will impact a total of 8 records:\n\n• 1 Job Position: The position will be cancelled\n• 3 Job Shifts: All scheduled shifts will be removed\n• 4 Job Position Assignments: All volunteer assignments will be cancelled\n\nI\'ve updated the visualization to show the impact of canceling just this position. The Volunteer Initiative will remain active.');
+                addMessage('agent', 'Got it! Canceling Food Drive Coordinator will impact a total of 8 records:\n\n• 1 Job Position: The position will be cancelled\n• 3 Job Shifts: All scheduled shifts will be removed\n• 4 Job Position Assignments: All volunteer assignments will be cancelled\n\nI\'ve updated the visualization to reflect the impact of canceling this position. Let me know if you\'d like to proceed with the cancellation!');
                 
                 // Update the visualization to show position-level impact
                 updateVisualizationForPosition();

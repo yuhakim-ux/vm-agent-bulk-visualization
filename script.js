@@ -633,14 +633,16 @@ function renderInitiativesList() {
             id: initiative.id,
             name: initiative.name,
             currentStatus: initiative.status,
-            plannedStatus: currentViewMode === 'initiative' ? 'Cancelled' : initiative.status
+            plannedStatus: currentViewMode === 'initiative' ? 'Cancelled' : initiative.status,
+            parentRecord: 'N/A'
         });
     });
     
     container.innerHTML = createDataTable('initiative', initiatives, [
         { key: 'name', label: 'Initiative Name', sortable: true, linked: true },
         { key: 'currentStatus', label: 'Current Status', sortable: true },
-        { key: 'plannedStatus', label: 'Planned Status', sortable: true }
+        { key: 'plannedStatus', label: 'Planned Status', sortable: true },
+        { key: 'parentRecord', label: 'Parent Record', sortable: true }
     ]);
 }
 
@@ -659,6 +661,7 @@ function renderPositionsList() {
                 name: position.name,
                 currentStatus: position.status,
                 plannedStatus: isAffected ? 'Cancelled' : position.status,
+                parentRecord: initiative.name,
                 isAffected: isAffected
             });
         });
@@ -667,7 +670,8 @@ function renderPositionsList() {
     container.innerHTML = createDataTable('position', positions, [
         { key: 'name', label: 'Position Name', sortable: true, linked: true },
         { key: 'currentStatus', label: 'Current Status', sortable: true },
-        { key: 'plannedStatus', label: 'Planned Status', sortable: true }
+        { key: 'plannedStatus', label: 'Planned Status', sortable: true },
+        { key: 'parentRecord', label: 'Parent Record', sortable: true }
     ]);
 }
 
@@ -687,6 +691,7 @@ function renderShiftsList() {
                     name: shift.name,
                     currentStatus: shift.status,
                     plannedStatus: isAffected ? 'Cancelled' : shift.status,
+                    parentRecord: position.name,
                     isAffected: isAffected
                 });
             });
@@ -696,7 +701,8 @@ function renderShiftsList() {
     container.innerHTML = createDataTable('shift', shifts, [
         { key: 'name', label: 'Shift Name', sortable: true, linked: true },
         { key: 'currentStatus', label: 'Current Status', sortable: true },
-        { key: 'plannedStatus', label: 'Planned Status', sortable: true }
+        { key: 'plannedStatus', label: 'Planned Status', sortable: true },
+        { key: 'parentRecord', label: 'Parent Record', sortable: true }
     ]);
 }
 
@@ -717,6 +723,7 @@ function renderAssignmentsList() {
                         name: `${shift.name} - ${assignment.volunteerName}`,
                         currentStatus: assignment.status,
                         plannedStatus: isAffected ? 'Cancelled' : assignment.status,
+                        parentRecord: shift.name,
                         personAccount: assignment.volunteerName,
                         isAffected: isAffected
                     });
@@ -729,6 +736,7 @@ function renderAssignmentsList() {
         { key: 'name', label: 'Assignment', sortable: true, linked: true },
         { key: 'currentStatus', label: 'Current Status', sortable: true },
         { key: 'plannedStatus', label: 'Planned Status', sortable: true },
+        { key: 'parentRecord', label: 'Parent Record', sortable: true },
         { key: 'personAccount', label: 'Person Account', sortable: true, linked: true }
     ]);
 }

@@ -318,6 +318,11 @@ function switchView(view) {
     
     // Show/hide tree controls
     document.getElementById('treeControls').style.display = view === 'tree' ? 'flex' : 'none';
+    
+    // Initialize the first tab when switching to List View
+    if (view === 'list') {
+        switchTab('initiatives');
+    }
 }
 
 // Tree view functions
@@ -619,6 +624,22 @@ function switchTab(tabName) {
         if (contentElement) {
             contentElement.classList.remove('slds-hide');
             contentElement.classList.add('slds-show');
+            
+            // Render the content for the selected tab
+            switch (tabName) {
+                case 'initiatives':
+                    renderInitiativesList();
+                    break;
+                case 'positions':
+                    renderPositionsList();
+                    break;
+                case 'shifts':
+                    renderShiftsList();
+                    break;
+                case 'assignments':
+                    renderAssignmentsList();
+                    break;
+            }
         }
     }
 }
